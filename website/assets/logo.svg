@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 50" width="220" height="50">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00ff9d;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00c9ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b36aff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Lightning bolt icon -->
+  <polygon points="18,4 8,26 16,26 12,46 26,20 17,20 24,4" fill="url(#logoGrad)" filter="url(#glow)"/>
+  <!-- OPEN CLI text -->
+  <text x="34" y="34" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="22" font-weight="700" fill="url(#logoGrad)" filter="url(#glow)" letter-spacing="2">OPEN CLI</text>
+</svg>

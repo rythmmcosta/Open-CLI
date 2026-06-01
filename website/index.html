@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open CLI — AI Terminal for Developers</title>
+  <meta name="description" content="Open CLI is a powerful AI-powered terminal tool with 20+ skills, browser automation, agent system, and multi-model support.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Page-specific: feature icons */
+    .feature-icon-wrap {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 18px;
+    }
+    .icon-green  { background: rgba(0,255,157,0.1);  border: 1px solid rgba(0,255,157,0.2);  }
+    .icon-blue   { background: rgba(0,201,255,0.1);  border: 1px solid rgba(0,201,255,0.2);  }
+    .icon-purple { background: rgba(179,106,255,0.1);border: 1px solid rgba(179,106,255,0.2);}
+    .icon-yellow { background: rgba(255,217,61,0.1); border: 1px solid rgba(255,217,61,0.2); }
+
+    /* providers row */
+    .providers-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+    }
+    .provider-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border-mid);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      transition: all 0.2s;
+    }
+    .provider-chip:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+    .provider-chip span { font-size: 1rem; }
+
+    /* models scroll ticker */
+    .model-ticker {
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      background: rgba(0,0,0,0.2);
+    }
+    .ticker-inner {
+      display: flex;
+      gap: 48px;
+      animation: ticker 20s linear infinite;
+      width: max-content;
+    }
+    .ticker-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+    .ticker-item::before {
+      content: '⚡';
+      color: var(--green);
+      font-size: 0.75rem;
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/logo.svg" alt="Open CLI">
+    </a>
+    <ul class="nav-links">
+      <li><a href="features.html">Features</a></li>
+      <li><a href="skills.html">Skills</a></li>
+      <li><a href="agents.html">Agents</a></li>
+      <li><a href="install.html">Install</a></li>
+      <li><a href="docs.html">Docs</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="install.html" class="btn btn-primary">Get Started</a>
+    </div>
+    <button class="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu">
+    <a href="features.html">Features</a>
+    <a href="skills.html">Skills</a>
+    <a href="agents.html">Agents</a>
+    <a href="install.html">Install</a>
+    <a href="docs.html">Docs</a>
+    <a href="install.html" style="color:var(--green);font-weight:700;">Get Started →</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="grid-lines"></div>
+    <div class="hero-orb orb-1"></div>
+    <div class="hero-orb orb-2"></div>
+    <div class="hero-orb orb-3"></div>
+  </div>
+
+  <div class="container">
+    <div class="hero-grid">
+      <!-- Left: Copy -->
+      <div class="hero-copy">
+        <div class="hero-tag">v1.0 — Open Source</div>
+        <h1 class="hero-title">
+          The AI Terminal<br>
+          <span class="gradient-text">Built for Developers</span>
+        </h1>
+        <p class="hero-subtitle">
+          Multi-model AI CLI with 20 built-in skills, browser automation, background agents,
+          Telegram notifications, and a blazing fast developer workflow.
+        </p>
+        <div class="hero-actions">
+          <a href="install.html" class="btn btn-primary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M3 19h18"/></svg>
+            Install Free
+          </a>
+          <a href="https://github.com/rythmmcosta/open-cli" class="btn btn-outline">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0112 7.1a9.56 9.56 0 012.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z"/></svg>
+            GitHub
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-num">20+</span>
+            <span class="stat-label">Built-in Skills</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">8</span>
+            <span class="stat-label">MCP Servers</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">4</span>
+            <span class="stat-label">AI Providers</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">∞</span>
+            <span class="stat-label">Agents</span>
+          </div>
+        </div>
+
+        <!-- Provider chips -->
+        <div class="providers-row">
+          <span style="font-size:0.78rem;color:var(--text-muted);font-family:var(--font-mono);">Works with:</span>
+          <div class="provider-chip"><span>🟣</span> Claude</div>
+          <div class="provider-chip"><span>🟢</span> GPT-4o</div>
+          <div class="provider-chip"><span>🔵</span> Gemini</div>
+          <div class="provider-chip"><span>🦙</span> Ollama</div>
+        </div>
+      </div>
+
+      <!-- Right: Terminal -->
+      <div class="hero-terminal">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <div class="terminal-dot dot-red"></div>
+            <div class="terminal-dot dot-yellow"></div>
+            <div class="terminal-dot dot-green"></div>
+            <div class="terminal-title">opencli.myowncloud.tech — zsh</div>
+          </div>
+          <div class="terminal-body" id="hero-term-body"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MODEL TICKER ─── -->
+<div class="model-ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">claude-opus-4-5</span>
+    <span class="ticker-item">gpt-4o</span>
+    <span class="ticker-item">gemini-2.0-flash</span>
+    <span class="ticker-item">ollama:llama3.2</span>
+    <span class="ticker-item">claude-sonnet-4-5</span>
+    <span class="ticker-item">gpt-4o-mini</span>
+    <span class="ticker-item">gemini-1.5-pro</span>
+    <span class="ticker-item">ollama:codellama</span>
+    <span class="ticker-item">claude-haiku-4-5</span>
+    <span class="ticker-item">o1-preview</span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item">claude-opus-4-5</span>
+    <span class="ticker-item">gpt-4o</span>
+    <span class="ticker-item">gemini-2.0-flash</span>
+    <span class="ticker-item">ollama:llama3.2</span>
+    <span class="ticker-item">claude-sonnet-4-5</span>
+    <span class="ticker-item">gpt-4o-mini</span>
+    <span class="ticker-item">gemini-1.5-pro</span>
+    <span class="ticker-item">ollama:codellama</span>
+    <span class="ticker-item">claude-haiku-4-5</span>
+    <span class="ticker-item">o1-preview</span>
+  </div>
+</div>
+
+<!-- ─── FEATURES ─── -->
+<section id="features">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Everything included</span>
+      <h2>Built for the modern<br><span class="gradient-text">developer workflow</span></h2>
+      <p>Every tool you need, zero configuration. Works out of the box with your existing projects.</p>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card">
+        <div class="feature-icon-wrap icon-green">🧠</div>
+        <h3>Multi-Model AI</h3>
+        <p>Switch between Claude, GPT-4o, Gemini, and local Ollama models with a single flag. No vendor lock-in.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon-wrap icon-blue">⚡</div>
+        <h3>20 Built-in Skills</h3>
+        <p>Deep system prompts for Vue, React, Python, Rust, Docker, TypeScript, GSAP, and more. Expert mode per domain.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon-wrap icon-purple">👁️</div>
+        <h3>Browser Automation</h3>
+        <p>Playwright-powered "eyes" that verify buttons, forms, scroll behavior and take screenshots of your live UI.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon-wrap icon-yellow">🤖</div>
+        <h3>Background Agents</h3>
+        <p>Define scheduled agents that run tasks while you sleep. Cron triggers, event-driven, or manual fire.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon-wrap icon-green">🔔</div>
+        <h3>Telegram & Discord</h3>
+        <p>Get notified on your phone when long-running tasks complete. Works with Telegram Bot and Discord Webhooks.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon-wrap icon-blue">🔌</div>
+        <h3>8 Built-in MCPs</h3>
+        <p>Filesystem, Shell, Git, HTTP, Database (SQLite), Docker, Web Search, and Browser tools — no downloads needed.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon-wrap icon-purple">🛡️</div>
+        <h3>Safety Sandbox</h3>
+        <p>3-tier risk scoring on every command. Auto-approve safe reads, prompt on destructive ops, force confirm on wipes.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon-wrap icon-yellow">📱</div>
+        <h3>Termux / Android</h3>
+        <p>Full CLI works on Android Termux. Use your phone as a remote terminal connected to your home server.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon-wrap icon-green">💬</div>
+        <h3>Interactive REPL</h3>
+        <p>Persistent conversation context, slash commands, profiles, history, and live streaming responses.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section id="how">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Get started in 60 seconds</span>
+      <h2>From install to<br><span class="gradient-text">first command</span></h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;">
+      <div class="steps">
+        <div class="step fade-up">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h3>Install globally</h3>
+            <p>One npm command gives you the <code style="color:var(--green);font-family:var(--font-mono)">opencli</code> binary everywhere.</p>
+            <div class="code-block">
+              <button class="copy-btn">Copy</button>
+              <span class="c-muted">$ </span><span class="c-green">npm install -g open-cli</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step fade-up">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h3>Add your AI key</h3>
+            <p>Interactive menu to connect Claude, GPT-4o, Gemini or local Ollama.</p>
+            <div class="code-block">
+              <button class="copy-btn">Copy</button>
+              <span class="c-muted">$ </span><span class="c-blue">opencli auth</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step fade-up">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h3>Start building</h3>
+            <p>One-shot prompts, interactive REPL, or pipe mode — your choice.</p>
+            <div class="code-block">
+              <button class="copy-btn">Copy</button>
+              <span class="c-muted">$ </span><span class="c-purple">opencli "refactor this function to async"</span><br>
+              <span class="c-muted">$ </span><span class="c-purple">opencli</span><span class="c-dim">  # interactive REPL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="terminal fade-in" style="margin-top: 16px;">
+        <div class="terminal-bar">
+          <div class="terminal-dot dot-red"></div>
+          <div class="terminal-dot dot-yellow"></div>
+          <div class="terminal-dot dot-green"></div>
+          <div class="terminal-title">Quick start</div>
+        </div>
+        <div class="terminal-body" id="install-term-body"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- ─── PIPE MODE ─── -->
+<section id="pipe">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Power user mode</span>
+      <h2>Pipe anything through<br><span class="gradient-text">Open CLI</span></h2>
+      <p>Combine Open CLI with your existing shell tools using Unix pipes.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
+      <div class="code-block fade-up">
+        <button class="copy-btn">Copy</button>
+        <span class="c-dim"># Explain a crash from logs</span><br>
+        <span class="c-muted">$ </span><span class="c-green">cat error.log | opencli "what caused this crash?"</span><br><br>
+        <span class="c-dim"># Write a commit message</span><br>
+        <span class="c-muted">$ </span><span class="c-blue">git diff | opencli "write a commit message"</span><br><br>
+        <span class="c-dim"># Type-safe review</span><br>
+        <span class="c-muted">$ </span><span class="c-purple">cat src/router.ts | opencli --skill typescript "review"</span><br><br>
+        <span class="c-dim"># Debug failing tests</span><br>
+        <span class="c-muted">$ </span><span class="c-yellow">npm test 2>&amp;1 | opencli "why did these fail?"</span>
+      </div>
+
+      <div class="code-block fade-up">
+        <button class="copy-btn">Copy</button>
+        <span class="c-dim"># Use a skill for one command</span><br>
+        <span class="c-muted">$ </span><span class="c-green">opencli --skill gsap "animate this hero section"</span><br><br>
+        <span class="c-dim"># Inject context file</span><br>
+        <span class="c-muted">$ </span><span class="c-blue">opencli -c README.md "write getting-started guide"</span><br><br>
+        <span class="c-dim"># Run with notification</span><br>
+        <span class="c-muted">$ </span><span class="c-purple">opencli --notify "run full test suite"</span><br><br>
+        <span class="c-dim"># Preview without running</span><br>
+        <span class="c-muted">$ </span><span class="c-yellow">opencli --dry-run "delete all log files"</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section id="cta" style="padding: 80px 0; background: rgba(0,255,157,0.02); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="container" style="text-align:center;">
+    <span class="section-label">Open source & free</span>
+    <h2 style="font-size:2.5rem;margin-bottom:20px;">
+      Ready to<br><span class="gradient-text">supercharge your terminal?</span>
+    </h2>
+    <p style="color:var(--text-dim);margin-bottom:40px;font-size:1.05rem;max-width:480px;margin-left:auto;margin-right:auto;">
+      Install in 30 seconds. Works on Linux, macOS, Windows, and Android Termux.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="install.html" class="btn btn-primary" style="font-size:1rem;padding:14px 28px;">
+        Install Open CLI
+      </a>
+      <a href="docs.html" class="btn btn-outline" style="font-size:1rem;padding:14px 28px;">
+        Read the Docs
+      </a>
+    </div>
+    <div style="margin-top:32px;">
+      <div class="cmd-pill">npm install -g open-cli</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html"><img src="assets/logo.svg" alt="Open CLI" style="height:36px;"></a>
+        <p>AI-powered terminal for developers. Open source, multi-model, built for real workflows.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="features.html">Features</a></li>
+          <li><a href="skills.html">Skills</a></li>
+          <li><a href="agents.html">Agents</a></li>
+          <li><a href="install.html">Install</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Docs</h4>
+        <ul>
+          <li><a href="docs.html">Getting Started</a></li>
+          <li><a href="docs.html#cli-flags">CLI Flags</a></li>
+          <li><a href="docs.html#config">Configuration</a></li>
+          <li><a href="docs.html#mcp">MCP Servers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Links</h4>
+        <ul>
+          <li><a href="https://github.com/rythmmcosta/open-cli">GitHub</a></li>
+          <li><a href="install.html#termux">Termux Guide</a></li>
+          <li><a href="docs.html#security">Security</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Open CLI — opencli.myowncloud.tech</p>
+      <p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted);">v1.0.0</p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="js/main.js"></script>
+<script src="js/terminal.js"></script>
+</body>
+</html>

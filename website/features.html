@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Features — Open CLI</title>
+  <meta name="description" content="Full feature list: browser automation, 8 MCP servers, safety sandbox, agents, and more.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .feature-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      padding: 60px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .feature-section:last-child { border-bottom: none; }
+    .feature-section.reversed .feature-visual { order: -1; }
+    @media(max-width:800px) {
+      .feature-section { grid-template-columns: 1fr; gap: 32px; }
+      .feature-section.reversed .feature-visual { order: 0; }
+    }
+    .mcp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .mcp-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      transition: all 0.2s;
+    }
+    .mcp-card:hover { border-color: var(--border-mid); transform: translateY(-2px); }
+    .mcp-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+    .mcp-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
+    .mcp-card p  { font-size: 0.78rem; color: var(--text-dim); }
+    .safety-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .safety-low    { background: rgba(0,255,157,0.06);  border: 1px solid rgba(0,255,157,0.15); }
+    .safety-medium { background: rgba(255,217,61,0.06); border: 1px solid rgba(255,217,61,0.15); }
+    .safety-high   { background: rgba(255,77,106,0.06); border: 1px solid rgba(255,77,106,0.15); }
+    .safety-label { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; }
+    .sl-low    { color: var(--green);  }
+    .sl-medium { color: var(--yellow); }
+    .sl-high   { color: var(--red);    }
+    .safety-desc { font-size: 0.82rem; color: var(--text-dim); }
+    .safety-action { font-family: var(--font-mono); font-size: 0.75rem; white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo"><img src="assets/logo.svg" alt="Open CLI"></a>
+    <ul class="nav-links">
+      <li><a href="features.html" class="active">Features</a></li>
+      <li><a href="skills.html">Skills</a></li>
+      <li><a href="agents.html">Agents</a></li>
+      <li><a href="install.html">Install</a></li>
+      <li><a href="docs.html">Docs</a></li>
+    </ul>
+    <div class="nav-cta"><a href="install.html" class="btn btn-primary">Get Started</a></div>
+    <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="mobile-menu">
+    <a href="features.html">Features</a><a href="skills.html">Skills</a>
+    <a href="agents.html">Agents</a><a href="install.html">Install</a><a href="docs.html">Docs</a>
+  </div>
+</nav>
+
+<section style="padding-top:140px;padding-bottom:60px;">
+  <div class="container" style="text-align:center;">
+    <span class="section-label">Everything you need</span>
+    <h1 style="font-size:clamp(2.2rem,4vw,3.5rem);margin-bottom:20px;">
+      Features built for<br><span class="gradient-text">real developer work</span>
+    </h1>
+    <p style="color:var(--text-dim);font-size:1.1rem;max-width:520px;margin:0 auto;">
+      Open CLI packs everything a developer needs into a single, zero-config terminal tool.
+    </p>
+  </div>
+</section>
+
+<!-- FEATURE SECTIONS -->
+<section style="padding-top:0;">
+  <div class="container">
+
+    <!-- Browser automation -->
+    <div class="feature-section">
+      <div class="feature-copy slide-left">
+        <span class="section-label">Browser "Eyes"</span>
+        <h2 style="font-size:1.9rem;margin-bottom:16px;">Playwright-powered<br><span class="gradient-text">visual verification</span></h2>
+        <p style="color:var(--text-dim);margin-bottom:20px;">
+          Ask Open CLI to verify your UI. It will navigate to the page, check buttons exist and are clickable,
+          verify forms work, scroll the page, and take a full-page screenshot.
+        </p>
+        <ul style="display:flex;flex-direction:column;gap:8px;list-style:none;margin-bottom:24px;">
+          <li style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-dim);">
+            <span style="color:var(--green);">✓</span> Screenshot full pages or elements
+          </li>
+          <li style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-dim);">
+            <span style="color:var(--green);">✓</span> Verify buttons, links, forms are clickable
+          </li>
+          <li style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-dim);">
+            <span style="color:var(--green);">✓</span> Check for console errors and 404s
+          </li>
+          <li style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-dim);">
+            <span style="color:var(--green);">✓</span> Extract data from rendered pages
+          </li>
+          <li style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-dim);">
+            <span style="color:var(--green);">✓</span> Scroll and interact with dynamic content
+          </li>
+        </ul>
+        <div class="badge badge-blue">Requires Playwright — desktop only</div>
+      </div>
+      <div class="feature-visual slide-right">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <div class="terminal-dot dot-red"></div>
+            <div class="terminal-dot dot-yellow"></div>
+            <div class="terminal-dot dot-green"></div>
+            <div class="terminal-title">Browser Automation</div>
+          </div>
+          <div class="terminal-body">
+            <div class="t-line"><span class="t-prompt">❯</span><span class="t-cmd">opencli --browser "verify my login page works"</span></div>
+            <div class="t-output"></div>
+            <div class="t-info">  👁 Launching browser...</div>
+            <div class="t-info">  🌐 Navigating to http://localhost:3000/login</div>
+            <div class="t-output"></div>
+            <div class="t-output">  Checking: email input exists     <span style="color:var(--green)">✓</span></div>
+            <div class="t-output">  Checking: password input exists  <span style="color:var(--green)">✓</span></div>
+            <div class="t-output">  Checking: submit button visible  <span style="color:var(--green)">✓</span></div>
+            <div class="t-output">  Checking: submit button clickable <span style="color:var(--green)">✓</span></div>
+            <div class="t-output">  Checking: no console errors      <span style="color:var(--green)">✓</span></div>
+            <div class="t-output"></div>
+            <div class="t-success">  ✓ Screenshot saved: screenshots/login-2025.png</div>
+            <div class="t-success">  ✓ All 5 checks passed</div>
+            <div class="t-output"></div>
+            <div class="t-line"><span class="t-prompt">❯</span><span class="cursor"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MCP Servers -->
+    <div class="feature-section reversed">
+      <div class="feature-copy slide-right">
+        <span class="section-label">Built-in MCP Servers</span>
+        <h2 style="font-size:1.9rem;margin-bottom:16px;">8 tool servers,<br><span class="gradient-text">zero downloads</span></h2>
+        <p style="color:var(--text-dim);margin-bottom:20px;">
+          Every MCP tool comes built-in. No external MCP downloads, no configuration. Just use them.
+        </p>
+        <div class="mcp-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="mcp-card"><div class="mcp-icon">📁</div><div><h4>Filesystem</h4><p>Read, write, search files</p></div></div>
+          <div class="mcp-card"><div class="mcp-icon">🔧</div><div><h4>Shell</h4><p>Execute bash commands</p></div></div>
+          <div class="mcp-card"><div class="mcp-icon">🌿</div><div><h4>Git</h4><p>Full git operations</p></div></div>
+          <div class="mcp-card"><div class="mcp-icon">🌐</div><div><h4>HTTP</h4><p>Fetch APIs and pages</p></div></div>
+          <div class="mcp-card"><div class="mcp-icon">🗄️</div><div><h4>Database</h4><p>SQLite queries + schema</p></div></div>
+          <div class="mcp-card"><div class="mcp-icon">🐳</div><div><h4>Docker</h4><p>Containers and compose</p></div></div>
+          <div class="mcp-card"><div class="mcp-icon">🔍</div><div><h4>Web Search</h4><p>DuckDuckGo + fetch</p></div></div>
+          <div class="mcp-card"><div class="mcp-icon">👁️</div><div><h4>Browser</h4><p>Playwright automation</p></div></div>
+        </div>
+      </div>
+      <div class="feature-visual slide-left">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <div class="terminal-dot dot-red"></div>
+            <div class="terminal-dot dot-yellow"></div>
+            <div class="terminal-dot dot-green"></div>
+            <div class="terminal-title">MCP Servers</div>
+          </div>
+          <div class="terminal-body">
+            <div class="t-line"><span class="t-prompt">❯</span><span class="t-cmd">opencli mcp</span></div>
+            <div class="t-output"></div>
+            <div class="t-info">  Built-in MCP Servers:</div>
+            <div class="t-output"></div>
+            <div class="t-success">  ✓ filesystem   — read, write, search files</div>
+            <div class="t-success">  ✓ shell        — execute bash commands</div>
+            <div class="t-success">  ✓ git          — full git operations</div>
+            <div class="t-success">  ✓ browser      — Playwright automation</div>
+            <div class="t-success">  ✓ http         — fetch URLs and APIs</div>
+            <div class="t-success">  ✓ database     — SQLite queries</div>
+            <div class="t-success">  ✓ docker       — container management</div>
+            <div class="t-success">  ✓ search       — DuckDuckGo + fetch</div>
+            <div class="t-output"></div>
+            <div class="t-output">  All servers built-in. No downloads needed.</div>
+            <div class="t-output"></div>
+            <div class="t-line"><span class="t-prompt">❯</span><span class="cursor"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Safety sandbox -->
+    <div class="feature-section">
+      <div class="feature-copy slide-left">
+        <span class="section-label">Safety Sandbox</span>
+        <h2 style="font-size:1.9rem;margin-bottom:16px;">3-tier risk scoring<br><span class="gradient-text">on every command</span></h2>
+        <p style="color:var(--text-dim);margin-bottom:24px;">
+          Every tool call is assessed for risk before execution. Safe reads run automatically.
+          Destructive operations require explicit confirmation.
+        </p>
+        <div>
+          <div class="safety-row safety-low">
+            <span class="safety-label sl-low">✓ LOW</span>
+            <span class="safety-desc">Read-only: ls, cat, grep, git log, npm list</span>
+            <span class="safety-action c-green">auto</span>
+          </div>
+          <div class="safety-row safety-medium">
+            <span class="safety-label sl-medium">⚠ MED</span>
+            <span class="safety-desc">Elevated: sudo, npm install -g, git push --force</span>
+            <span class="safety-action c-yellow">[Y/n]</span>
+          </div>
+          <div class="safety-row safety-high">
+            <span class="safety-label sl-high">✕ HIGH</span>
+            <span class="safety-desc">Destructive: rm -rf, DROP TABLE, dd, mkfs</span>
+            <span class="safety-action c-red">type "yes"</span>
+          </div>
+        </div>
+        <div style="margin-top:20px;" class="code-block">
+          <span class="c-muted"># Preview without running</span><br>
+          <span class="c-muted">$ </span><span class="c-blue">opencli --dry-run "delete log files"</span><br>
+          <span class="c-dim">  [DRY RUN] find . -name "*.log" -delete</span>
+        </div>
+      </div>
+      <div class="feature-visual slide-right">
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="card">
+            <div class="card-icon icon-yellow">🔍</div>
+            <h3>Diff Preview</h3>
+            <p>Before writing any existing file, a diff preview shows exactly what will change.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon icon-blue">🔐</div>
+            <h3>Sensitive Path Detection</h3>
+            <p>Reading <code style="color:var(--blue);font-family:var(--font-mono)">~/.ssh/*</code>, <code style="color:var(--blue);font-family:var(--font-mono)">.env</code>, or <code style="color:var(--blue);font-family:var(--font-mono)">*.pem</code> automatically upgrades to MEDIUM risk.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon icon-green">⚡</div>
+            <h3>Auto-approve Low Risk</h3>
+            <p>Use <code style="color:var(--green);font-family:var(--font-mono)">-y</code> flag to auto-approve all LOW risk commands in trusted environments.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FULL FEATURE TABLE -->
+<section>
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Complete feature list</span>
+      <h2>Everything that's<br><span class="gradient-text">included</span></h2>
+    </div>
+
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+      <table class="feature-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Status</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Multi-provider AI (Claude, GPT, Gemini)</td><td><span class="check">✓</span></td><td>API key per provider</td></tr>
+          <tr><td>Ollama local AI</td><td><span class="check">✓</span></td><td>No cloud needed</td></tr>
+          <tr><td>20 built-in skills</td><td><span class="check">✓</span></td><td>See Skills page</td></tr>
+          <tr><td>Interactive REPL</td><td><span class="check">✓</span></td><td>Slash commands + history</td></tr>
+          <tr><td>One-shot mode</td><td><span class="check">✓</span></td><td><code style="font-family:var(--font-mono);font-size:0.8rem;">opencli "..."</code></td></tr>
+          <tr><td>Pipe mode</td><td><span class="check">✓</span></td><td><code style="font-family:var(--font-mono);font-size:0.8rem;">cat file | opencli</code></td></tr>
+          <tr><td>File tools (read/write/search)</td><td><span class="check">✓</span></td><td>Diff preview on write</td></tr>
+          <tr><td>Shell execution</td><td><span class="check">✓</span></td><td>Safety sandbox included</td></tr>
+          <tr><td>Git tools</td><td><span class="check">✓</span></td><td>Full git operations</td></tr>
+          <tr><td>HTTP requests</td><td><span class="check">✓</span></td><td>All methods, headers, JSON</td></tr>
+          <tr><td>SQLite database tools</td><td><span class="check">✓</span></td><td>Queries + schema</td></tr>
+          <tr><td>Docker tools</td><td><span class="check">✓</span></td><td>list, logs, exec, compose</td></tr>
+          <tr><td>Web search + fetch</td><td><span class="check">✓</span></td><td>DuckDuckGo API</td></tr>
+          <tr><td>Browser automation</td><td><span class="check">✓</span></td><td>Playwright, desktop only</td></tr>
+          <tr><td>Screenshots</td><td><span class="check">✓</span></td><td>Full page or element</td></tr>
+          <tr><td>Agent system</td><td><span class="check">✓</span></td><td>10 types, cron/file/manual</td></tr>
+          <tr><td>Background processes</td><td><span class="check">✓</span></td><td>Detached, daemon-like</td></tr>
+          <tr><td>Telegram notifications</td><td><span class="check">✓</span></td><td>Bot API</td></tr>
+          <tr><td>Discord notifications</td><td><span class="check">✓</span></td><td>Webhook + embeds</td></tr>
+          <tr><td>Config profiles</td><td><span class="check">✓</span></td><td>model + skill + system</td></tr>
+          <tr><td>Dry-run mode</td><td><span class="check">✓</span></td><td>Preview without executing</td></tr>
+          <tr><td>Context injection</td><td><span class="check">✓</span></td><td><code style="font-family:var(--font-mono);font-size:0.8rem;">-c file</code> flag</td></tr>
+          <tr><td>Streaming responses</td><td><span class="check">✓</span></td><td>Live token streaming</td></tr>
+          <tr><td>Cost tracking</td><td><span class="check">✓</span></td><td><code style="font-family:var(--font-mono);font-size:0.8rem;">--show-cost</code></td></tr>
+          <tr><td>Termux / Android</td><td><span class="check">✓</span></td><td>No browser on ARM</td></tr>
+          <tr><td>Audit log</td><td><span style="color:var(--yellow);">⏳</span></td><td>Coming soon</td></tr>
+          <tr><td>Project-level .opencli config</td><td><span style="color:var(--yellow);">⏳</span></td><td>Coming soon</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html"><img src="assets/logo.svg" alt="Open CLI" style="height:36px;"></a>
+        <p>AI-powered terminal for developers.</p>
+      </div>
+      <div class="footer-col"><h4>Product</h4><ul>
+        <li><a href="features.html">Features</a></li><li><a href="skills.html">Skills</a></li>
+        <li><a href="agents.html">Agents</a></li><li><a href="install.html">Install</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Docs</h4><ul>
+        <li><a href="docs.html">Getting Started</a></li><li><a href="docs.html#config">Config</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Links</h4><ul>
+        <li><a href="https://github.com/rythmmcosta/open-cli">GitHub</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Open CLI — opencli.myowncloud.tech</p>
+      <p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted);">v1.0.0</p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

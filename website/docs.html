@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docs — Open CLI</title>
+  <meta name="description" content="Complete Open CLI documentation: CLI flags, configuration, MCP servers, security, and more.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .docs-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+    .docs-sidebar {
+      position: sticky;
+      top: 100px;
+    }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 2px; }
+    .sidebar-nav a {
+      display: block;
+      padding: 7px 12px;
+      border-radius: 7px;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      border-left: 2px solid transparent;
+    }
+    .sidebar-nav a:hover { color: var(--green); background: rgba(0,255,157,0.04); }
+    .sidebar-nav a.active { color: var(--green); border-left-color: var(--green); background: rgba(0,255,157,0.06); }
+    .sidebar-section {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      padding: 14px 12px 6px;
+    }
+    .docs-content { min-width: 0; }
+    .docs-section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+    .docs-section:last-child { border-bottom: none; }
+    .docs-section h2 { font-size: 1.7rem; margin-bottom: 16px; }
+    .docs-section h3 { font-size: 1.1rem; font-weight: 700; margin: 28px 0 10px; color: var(--text); }
+    .docs-section p  { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 14px; line-height: 1.7; }
+    .docs-section ul, .docs-section ol {
+      color: var(--text-dim); font-size: 0.9rem; padding-left: 20px; margin-bottom: 14px; line-height: 1.8;
+    }
+    .inline-code {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: var(--blue);
+    }
+    @media(max-width:860px) {
+      .docs-layout { grid-template-columns: 1fr; }
+      .docs-sidebar { position: static; display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo"><img src="assets/logo.svg" alt="Open CLI"></a>
+    <ul class="nav-links">
+      <li><a href="features.html">Features</a></li>
+      <li><a href="skills.html">Skills</a></li>
+      <li><a href="agents.html">Agents</a></li>
+      <li><a href="install.html">Install</a></li>
+      <li><a href="docs.html" class="active">Docs</a></li>
+    </ul>
+    <div class="nav-cta"><a href="install.html" class="btn btn-primary">Get Started</a></div>
+    <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="mobile-menu">
+    <a href="features.html">Features</a><a href="skills.html">Skills</a>
+    <a href="agents.html">Agents</a><a href="install.html">Install</a><a href="docs.html">Docs</a>
+  </div>
+</nav>
+
+<section style="padding-top:140px;padding-bottom:40px;">
+  <div class="container" style="text-align:center;">
+    <span class="section-label">Reference</span>
+    <h1 style="font-size:clamp(2rem,4vw,3rem);margin-bottom:16px;">Documentation</h1>
+    <p style="color:var(--text-dim);font-size:1rem;max-width:480px;margin:0 auto;">
+      Complete reference for CLI flags, configuration, MCP servers, skills, agents, and security.
+    </p>
+  </div>
+</section>
+
+<section style="padding-top:0;padding-bottom:80px;">
+  <div class="container">
+    <div class="docs-layout">
+
+      <!-- SIDEBAR -->
+      <div class="docs-sidebar">
+        <ul class="sidebar-nav">
+          <li class="sidebar-section">Getting Started</li>
+          <li><a href="#quickstart" class="active">Quick Start</a></li>
+          <li><a href="#auth">Authentication</a></li>
+          <li class="sidebar-section">Reference</li>
+          <li><a href="#cli-flags">CLI Flags</a></li>
+          <li><a href="#commands">Commands</a></li>
+          <li><a href="#repl">REPL Commands</a></li>
+          <li class="sidebar-section">Config</li>
+          <li><a href="#config">Configuration</a></li>
+          <li><a href="#profiles">Profiles</a></li>
+          <li><a href="#env-vars">Env Variables</a></li>
+          <li class="sidebar-section">Features</li>
+          <li><a href="#mcp">MCP Servers</a></li>
+          <li><a href="#skills-ref">Skills</a></li>
+          <li><a href="#agents-ref">Agents</a></li>
+          <li><a href="#browser">Browser Tools</a></li>
+          <li><a href="#notifications">Notifications</a></li>
+          <li class="sidebar-section">Platform</li>
+          <li><a href="#security">Security</a></li>
+          <li><a href="#termux-ref">Termux</a></li>
+        </ul>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="docs-content">
+
+        <div class="docs-section" id="quickstart">
+          <h2><span class="gradient-text">Quick Start</span></h2>
+          <p>Install Open CLI globally and run your first command in under 60 seconds.</p>
+          <div class="code-block">
+            <button class="copy-btn">Copy</button>
+            <span class="c-muted"># 1. Install</span><br>
+            <span class="c-muted">$ </span><span class="c-green">npm install -g open-cli</span><br><br>
+            <span class="c-muted"># 2. Connect AI provider</span><br>
+            <span class="c-muted">$ </span><span class="c-blue">opencli auth</span><br><br>
+            <span class="c-muted"># 3. Run a prompt</span><br>
+            <span class="c-muted">$ </span><span class="c-purple">opencli "list all .ts files changed today"</span><br><br>
+            <span class="c-muted"># 4. Interactive REPL</span><br>
+            <span class="c-muted">$ </span><span class="c-green">opencli</span>
+          </div>
+        </div>
+
+        <div class="docs-section" id="auth">
+          <h2>Authentication</h2>
+          <p>Open CLI supports four AI providers. Run <span class="inline-code">opencli auth</span> to connect any of them.</p>
+          <h3>Supported Providers</h3>
+          <ul>
+            <li><strong>Anthropic</strong> — Claude models (claude-opus-4-5, claude-sonnet-4-5, claude-haiku-4-5)</li>
+            <li><strong>OpenAI</strong> — GPT-4o, gpt-4o-mini, o1-preview, o1-mini</li>
+            <li><strong>Google Gemini</strong> — gemini-2.0-flash, gemini-2.0-flash-lite, gemini-1.5-pro</li>
+            <li><strong>Ollama</strong> — Any local model (llama3.2, codellama, mistral, etc.)</li>
+          </ul>
+          <div class="code-block">
+            <button class="copy-btn">Copy</button>
+            <span class="c-muted"># Interactive setup</span><br>
+            <span class="c-muted">$ </span><span class="c-green">opencli auth</span><br><br>
+            <span class="c-muted"># Or use environment variables</span><br>
+            <span class="c-muted">$ </span><span class="c-blue">export ANTHROPIC_API_KEY="sk-ant-..."</span><br>
+            <span class="c-muted">$ </span><span class="c-blue">export OPENAI_API_KEY="sk-..."</span><br>
+            <span class="c-muted">$ </span><span class="c-blue">export GEMINI_API_KEY="AIza..."</span>
+          </div>
+        </div>
+
+        <div class="docs-section" id="cli-flags">
+          <h2>CLI Flags</h2>
+          <p>All available flags for the <span class="inline-code">opencli</span> command:</p>
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+            <table class="feature-table">
+              <thead><tr><th>Flag</th><th>Short</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code class="inline-code">--model &lt;name&gt;</code></td><td><code class="inline-code">-m</code></td><td>AI model to use</td></tr>
+                <tr><td><code class="inline-code">--skill &lt;name&gt;</code></td><td><code class="inline-code">-s</code></td><td>Built-in skill to activate</td></tr>
+                <tr><td><code class="inline-code">--yes</code></td><td><code class="inline-code">-y</code></td><td>Auto-approve low-risk commands</td></tr>
+                <tr><td><code class="inline-code">--dry-run</code></td><td>—</td><td>Preview tool calls without executing</td></tr>
+                <tr><td><code class="inline-code">--profile &lt;name&gt;</code></td><td><code class="inline-code">-p</code></td><td>Apply a saved config profile</td></tr>
+                <tr><td><code class="inline-code">--show-cost</code></td><td>—</td><td>Display token usage and estimated cost</td></tr>
+                <tr><td><code class="inline-code">--no-color</code></td><td>—</td><td>Disable terminal colors</td></tr>
+                <tr><td><code class="inline-code">--verbose</code></td><td><code class="inline-code">-v</code></td><td>Show raw tool call details</td></tr>
+                <tr><td><code class="inline-code">--context &lt;file&gt;</code></td><td><code class="inline-code">-c</code></td><td>Inject a file into the prompt context</td></tr>
+                <tr><td><code class="inline-code">--browser</code></td><td>—</td><td>Enable browser automation tools</td></tr>
+                <tr><td><code class="inline-code">--notify</code></td><td>—</td><td>Send notification when task completes</td></tr>
+                <tr><td><code class="inline-code">--version</code></td><td><code class="inline-code">-V</code></td><td>Show version</td></tr>
+                <tr><td><code class="inline-code">--help</code></td><td><code class="inline-code">-h</code></td><td>Show help text</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="code-block">
+            <button class="copy-btn">Copy</button>
+            <span class="c-muted"># Examples</span><br>
+            <span class="c-muted">$ </span><span class="c-green">opencli --model gpt-4o "explain this code"</span><br>
+            <span class="c-muted">$ </span><span class="c-blue">opencli --skill python --yes "add tests"</span><br>
+            <span class="c-muted">$ </span><span class="c-purple">opencli --dry-run "delete all node_modules"</span><br>
+            <span class="c-muted">$ </span><span class="c-yellow">opencli -c package.json "update to latest deps"</span>
+          </div>
+        </div>
+
+        <div class="docs-section" id="commands">
+          <h2>Subcommands</h2>
+          <h3>opencli auth</h3>
+          <p>Interactive menu to add/remove/test AI provider API keys.</p>
+          <h3>opencli skills</h3>
+          <p>List all 20 built-in skills with descriptions.</p>
+          <h3>opencli mcp</h3>
+          <p>List all 8 built-in MCP servers and their tools.</p>
+          <h3>opencli config</h3>
+          <p>Show current configuration (model, skill, providers, etc.).</p>
+          <h3>opencli browser &lt;action&gt;</h3>
+          <div class="code-block">
+            <button class="copy-btn">Copy</button>
+            <span class="c-muted">$ </span><span class="c-green">opencli browser install</span><span class="c-dim">             # Install Playwright</span><br>
+            <span class="c-muted">$ </span><span class="c-green">opencli browser screenshot &lt;url&gt;</span><span class="c-dim">  # Take screenshot</span><br>
+            <span class="c-muted">$ </span><span class="c-green">opencli browser verify &lt;url&gt;</span><span class="c-dim">      # Verify page</span>
+          </div>
+          <h3>opencli agent &lt;subcommand&gt;</h3>
+          <div class="code-block">
+            <button class="copy-btn">Copy</button>
+            <span class="c-muted">$ </span><span class="c-blue">opencli agent list</span><span class="c-dim">                  # List agents</span><br>
+            <span class="c-muted">$ </span><span class="c-blue">opencli agent types</span><span class="c-dim">                 # Show types</span><br>
+            <span class="c-muted">$ </span><span class="c-blue">opencli agent run &lt;name&gt;</span><span class="c-dim">            # Run now</span><br>
+            <span class="c-muted">$ </span><span class="c-blue">opencli agent background &lt;name&gt;</span><span class="c-dim">     # Background run</span><br>
+            <span class="c-muted">$ </span><span class="c-blue">opencli agent delete &lt;name&gt;</span><span class="c-dim">         # Delete</span>
+          </div>
+          <h3>opencli notify &lt;subcommand&gt;</h3>
+          <div class="code-block">
+            <button class="copy-btn">Copy</button>
+            <span class="c-muted">$ </span><span class="c-purple">opencli notify setup</span><span class="c-dim">                     # Configure</span><br>
+            <span class="c-muted">$ </span><span class="c-purple">opencli notify test</span><span class="c-dim">                      # Test send</span><br>
+            <span class="c-muted">$ </span><span class="c-purple">opencli notify send "Done" --level success</span>
+          </div>
+        </div>
+
+        <div class="docs-section" id="repl">
+          <h2>REPL Slash Commands</h2>
+          <p>When running in interactive mode (<span class="inline-code">opencli</span>), these slash commands are available:</p>
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+            <table class="feature-table">
+              <thead><tr><th>Command</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code class="inline-code">/auth</code></td><td>Open auth wizard</td></tr>
+                <tr><td><code class="inline-code">/model &lt;name&gt;</code></td><td>Switch AI model</td></tr>
+                <tr><td><code class="inline-code">/skill &lt;name&gt;</code></td><td>Switch skill</td></tr>
+                <tr><td><code class="inline-code">/skills</code></td><td>List all skills</td></tr>
+                <tr><td><code class="inline-code">/profile &lt;name&gt;</code></td><td>Apply a saved profile</td></tr>
+                <tr><td><code class="inline-code">/mcp</code></td><td>List MCP servers</td></tr>
+                <tr><td><code class="inline-code">/browser &lt;action&gt;</code></td><td>Browser commands</td></tr>
+                <tr><td><code class="inline-code">/agent &lt;subcommand&gt;</code></td><td>Agent management</td></tr>
+                <tr><td><code class="inline-code">/notify &lt;subcommand&gt;</code></td><td>Notification commands</td></tr>
+                <tr><td><code class="inline-code">/dry-run</code></td><td>Toggle dry-run mode</td></tr>
+                <tr><td><code class="inline-code">/auto</code></td><td>Toggle auto-approve</td></tr>
+                <tr><td><code class="inline-code">/clear</code></td><td>Clear the screen</td></tr>
+                <tr><td><code class="inline-code">/reset</code></td><td>Reset conversation</td></tr>
+                <tr><td><code class="inline-code">/history</code></td><td>Show message history</td></tr>
+                <tr><td><code class="inline-code">/cost</code></td><td>Show token usage</td></tr>
+                <tr><td><code class="inline-code">/help</code></td><td>Show all commands</td></tr>
+                <tr><td><code class="inline-code">/exit</code></td><td>Exit REPL</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="docs-section" id="config">
+          <h2>Configuration</h2>
+          <p>Config is stored at <span class="inline-code">~/.config/opencli/config.json</span>.</p>
+          <div class="code-block">
+            <button class="copy-btn">Copy</button>
+            <span class="c-dim">{</span><br>
+            &nbsp;&nbsp;<span class="c-blue">"defaultModel"</span><span class="c-dim">:</span> <span class="c-green">"claude-opus-4-5"</span><span class="c-dim">,</span><br>
+            &nbsp;&nbsp;<span class="c-blue">"activeSkill"</span><span class="c-dim">:</span> <span class="c-green">"default"</span><span class="c-dim">,</span><br>
+            &nbsp;&nbsp;<span class="c-blue">"autoApprove"</span><span class="c-dim">:</span> <span class="c-yellow">false</span><span class="c-dim">,</span><br>
+            &nbsp;&nbsp;<span class="c-blue">"dryRun"</span><span class="c-dim">:</span> <span class="c-yellow">false</span><span class="c-dim">,</span><br>
+            &nbsp;&nbsp;<span class="c-blue">"contextWindow"</span><span class="c-dim">:</span> <span class="c-yellow">20</span><span class="c-dim">,</span><br>
+            &nbsp;&nbsp;<span class="c-blue">"showUsage"</span><span class="c-dim">:</span> <span class="c-yellow">false</span><span class="c-dim">,</span><br>
+            &nbsp;&nbsp;<span class="c-blue">"providers"</span><span class="c-dim">: {</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="c-blue">"anthropic"</span><span class="c-dim">:</span> <span class="c-dim">{ "apiKey": "sk-ant-..." }</span><span class="c-dim">,</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="c-blue">"ollama"</span><span class="c-dim">:</span> <span class="c-dim">{ "baseUrl": "http://localhost:11434" }</span><br>
+            &nbsp;&nbsp;<span class="c-dim">}</span><br>
+            <span class="c-dim">}</span>
+          </div>
+        </div>
+
+        <div class="docs-section" id="profiles">
+          <h2>Profiles</h2>
+          <p>Profiles let you save and switch between sets of config: model + skill + system prompt.</p>
+          <div class="code-block">
+            <button class="copy-btn">Copy</button>
+            <span class="c-dim">"profiles": {</span><br>
+            &nbsp;&nbsp;<span class="c-green">"frontend"</span><span class="c-dim">: {</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="c-blue">"model"</span><span class="c-dim">:</span> <span class="c-green">"claude-opus-4-5"</span><span class="c-dim">,</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="c-blue">"skill"</span><span class="c-dim">:</span> <span class="c-green">"vuejs"</span><br>
+            &nbsp;&nbsp;<span class="c-dim">},</span><br>
+            &nbsp;&nbsp;<span class="c-blue">"backend"</span><span class="c-dim">: {</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="c-blue">"model"</span><span class="c-dim">:</span> <span class="c-green">"gpt-4o"</span><span class="c-dim">,</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="c-blue">"skill"</span><span class="c-dim">:</span> <span class="c-green">"nodejs"</span><span class="c-dim">,</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="c-blue">"system"</span><span class="c-dim">:</span> <span class="c-green">"Senior backend engineer. Be concise."</span><br>
+            &nbsp;&nbsp;<span class="c-dim">}</span><br>
+            <span class="c-dim">}</span>
+          </div>
+          <div class="code-block" style="margin-top:12px;">
+            <button class="copy-btn">Copy</button>
+            <span class="c-muted">$ </span><span class="c-green">opencli --profile frontend "add dark mode toggle"</span><br>
+            <span class="c-green">❯ /profile backend</span>
+          </div>
+        </div>
+
+        <div class="docs-section" id="env-vars">
+          <h2>Environment Variables</h2>
+          <p>API keys can be set via environment variables instead of the config file:</p>
+          <div class="code-block">
+            <button class="copy-btn">Copy</button>
+            <span class="c-muted">export </span><span class="c-blue">ANTHROPIC_API_KEY</span><span class="c-dim">="sk-ant-..."</span><br>
+            <span class="c-muted">export </span><span class="c-blue">OPENAI_API_KEY</span><span class="c-dim">="sk-..."</span><br>
+            <span class="c-muted">export </span><span class="c-blue">GEMINI_API_KEY</span><span class="c-dim">="AIza..."</span><br><br>
+            <span class="c-muted"># Add to ~/.bashrc or ~/.zshrc to persist</span>
+          </div>
+        </div>
+
+        <div class="docs-section" id="mcp">
+          <h2>MCP Servers</h2>
+          <p>All 8 MCP servers are built-in. Use <span class="inline-code">opencli mcp</span> to list them.</p>
+          <ul>
+            <li><strong>filesystem</strong> — read_file, write_file, list_files, search_files</li>
+            <li><strong>shell</strong> — execute_bash</li>
+            <li><strong>git</strong> — git_command</li>
+            <li><strong>browser</strong> — navigate, screenshot, click, fill_form, verify, extract</li>
+            <li><strong>http</strong> — http_request (GET/POST/PUT/DELETE)</li>
+            <li><strong>database</strong> — db_query, db_schema</li>
+            <li><strong>docker</strong> — docker_list, docker_logs, docker_exec, docker_compose</li>
+            <li><strong>search</strong> — web_search, fetch_page</li>
+          </ul>
+        </div>
+
+        <div class="docs-section" id="security">
+          <h2 id="security">Security</h2>
+          <p>Open CLI uses a 3-tier risk scoring system to keep your system safe.</p>
+          <h3>Risk Levels</h3>
+          <ul>
+            <li><span style="color:var(--green)">LOW</span> — Read-only commands. Auto-executed with <span class="inline-code">-y</span>.</li>
+            <li><span style="color:var(--yellow)">MEDIUM</span> — Elevated access (sudo, global installs). Always prompts [Y/n].</li>
+            <li><span style="color:var(--red)">HIGH</span> — Destructive (rm -rf, DROP TABLE). Must type "yes" in full.</li>
+          </ul>
+          <h3>Best Practices</h3>
+          <ul>
+            <li>Use <span class="inline-code">--dry-run</span> first on cleanup/delete operations</li>
+            <li>Only use <span class="inline-code">-y</span> in trusted, known project directories</li>
+            <li>API keys are stored with 0600 permissions — never share your config</li>
+            <li>Reading <span class="inline-code">.env</span>, <span class="inline-code">*.pem</span>, or <span class="inline-code">~/.ssh/*</span> auto-upgrades to MEDIUM risk</li>
+          </ul>
+        </div>
+
+        <div class="docs-section" id="termux-ref">
+          <h2>Termux (Android)</h2>
+          <p>Full Open CLI works on Termux, except browser automation (Playwright requires a desktop OS).</p>
+          <div class="code-block">
+            <button class="copy-btn">Copy</button>
+            <span class="c-muted"># Step 1: Install deps</span><br>
+            <span class="c-muted">$ </span><span class="c-green">pkg update &amp;&amp; pkg install nodejs git python make clang</span><br><br>
+            <span class="c-muted"># Step 2: Clone and install</span><br>
+            <span class="c-muted">$ </span><span class="c-blue">git clone https://github.com/rythmmcosta/open-cli.git</span><br>
+            <span class="c-muted">$ </span><span class="c-blue">cd open-cli &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; npm link</span><br><br>
+            <span class="c-muted"># Step 3: Configure</span><br>
+            <span class="c-muted">$ </span><span class="c-purple">opencli auth</span>
+          </div>
+          <p>See the full <a href="install.html#termux" style="color:var(--blue)">Termux installation guide →</a></p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html"><img src="assets/logo.svg" alt="Open CLI" style="height:36px;"></a>
+        <p>AI-powered terminal for developers.</p>
+      </div>
+      <div class="footer-col"><h4>Product</h4><ul>
+        <li><a href="features.html">Features</a></li><li><a href="skills.html">Skills</a></li>
+        <li><a href="agents.html">Agents</a></li><li><a href="install.html">Install</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Docs</h4><ul>
+        <li><a href="docs.html#quickstart">Quick Start</a></li>
+        <li><a href="docs.html#cli-flags">CLI Flags</a></li>
+        <li><a href="docs.html#config">Config</a></li>
+        <li><a href="docs.html#security">Security</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Links</h4><ul>
+        <li><a href="https://github.com/rythmmcosta/open-cli">GitHub</a></li>
+        <li><a href="install.html#termux">Termux Guide</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Open CLI — opencli.myowncloud.tech</p>
+      <p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted);">v1.0.0</p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="js/main.js"></script>
+<script>
+// sidebar active link on scroll
+const sections = document.querySelectorAll('.docs-section[id]');
+const links = document.querySelectorAll('.sidebar-nav a');
+
+function onScroll() {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 120) current = s.id;
+  });
+  links.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+</script>
+</body>
+</html>
