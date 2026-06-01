@@ -1,13 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Features — Open CLI</title>
-  <meta name="description" content="Full feature list: browser automation, 8 MCP servers, safety sandbox, agents, and more.">
+  <meta name="description" content="Open CLI features: Playwright browser automation, 8 built-in MCP servers, 3-tier safety sandbox, background agents, Telegram notifications, and more.">
+  <meta name="keywords" content="Open CLI features, browser automation, Playwright, MCP servers, AI agents, developer tools">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://opencli.myowncloud.tech/features.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Open CLI">
+  <meta property="og:title" content="Features — Open CLI">
+  <meta property="og:description" content="Browser automation, 8 MCP servers, safety sandbox, background agents, Telegram/Discord notifications — all built in.">
+  <meta property="og:image" content="https://opencli.myowncloud.tech/assets/og-image.png">
+  <meta property="og:url" content="https://opencli.myowncloud.tech/features.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Open CLI Features">
+  <meta name="twitter:description" content="All features built into Open CLI — no extra downloads required.">
+  <meta name="twitter:image" content="https://opencli.myowncloud.tech/assets/og-image.png">
+  <meta name="theme-color" content="#070b14" id="theme-color-meta">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script>(function(){var t=localStorage.getItem('opencli-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
   <style>
     .feature-section {
       display: grid;
@@ -20,8 +35,13 @@
     .feature-section:last-child { border-bottom: none; }
     .feature-section.reversed .feature-visual { order: -1; }
     @media(max-width:800px) {
-      .feature-section { grid-template-columns: 1fr; gap: 32px; }
+      .feature-section { grid-template-columns: 1fr; gap: 24px; padding: 40px 0; }
       .feature-section.reversed .feature-visual { order: 0; }
+      .safety-row { grid-template-columns: auto 1fr auto; font-size: 0.8rem; }
+    }
+    @media(max-width:640px) {
+      .feature-section { padding: 32px 0; gap: 20px; }
+      .mcp-grid { grid-template-columns: 1fr 1fr !important; }
     }
     .mcp-grid {
       display: grid;
@@ -74,7 +94,13 @@
       <li><a href="install.html">Install</a></li>
       <li><a href="docs.html">Docs</a></li>
     </ul>
-    <div class="nav-cta"><a href="install.html" class="btn btn-primary">Get Started</a></div>
+    <div class="nav-right">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      </button>
+      <a href="install.html" class="btn btn-primary">Get Started</a>
+    </div>
     <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
   <div class="mobile-menu">

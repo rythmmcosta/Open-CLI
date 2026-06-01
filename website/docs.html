@@ -1,13 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Docs — Open CLI</title>
-  <meta name="description" content="Complete Open CLI documentation: CLI flags, configuration, MCP servers, security, and more.">
+  <meta name="description" content="Open CLI documentation: CLI flags, authentication, configuration, profiles, MCP servers, skills, agents, browser tools, notifications, and security.">
+  <meta name="keywords" content="Open CLI docs, CLI flags, configuration, MCP, skills, agents, API reference">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://opencli.myowncloud.tech/docs.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Open CLI">
+  <meta property="og:title" content="Documentation — Open CLI">
+  <meta property="og:description" content="Complete reference: CLI flags, config, profiles, MCP servers, skills, agents, browser tools, and security.">
+  <meta property="og:image" content="https://opencli.myowncloud.tech/assets/og-image.png">
+  <meta property="og:url" content="https://opencli.myowncloud.tech/docs.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Open CLI Documentation">
+  <meta name="twitter:description" content="Complete API reference and configuration guide for Open CLI.">
+  <meta name="twitter:image" content="https://opencli.myowncloud.tech/assets/og-image.png">
+  <meta name="theme-color" content="#070b14" id="theme-color-meta">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script>(function(){var t=localStorage.getItem('opencli-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
   <style>
     .docs-layout {
       display: grid;
@@ -64,7 +79,41 @@
     @media(max-width:860px) {
       .docs-layout { grid-template-columns: 1fr; }
       .docs-sidebar { position: static; display: none; }
+      .mobile-toc { display: block; }
     }
+    /* Mobile TOC */
+    .mobile-toc { display: none; margin-bottom: 32px; }
+    .mobile-toc summary {
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--green);
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      list-style: none;
+      font-weight: 600;
+    }
+    .mobile-toc summary::-webkit-details-marker { display: none; }
+    .mobile-toc[open] summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+    .mobile-toc nav {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      padding: 8px 0;
+    }
+    .mobile-toc nav a {
+      display: block;
+      padding: 8px 14px;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+    .mobile-toc nav a:hover { color: var(--green); }
   </style>
 </head>
 <body>
@@ -79,7 +128,13 @@
       <li><a href="install.html">Install</a></li>
       <li><a href="docs.html" class="active">Docs</a></li>
     </ul>
-    <div class="nav-cta"><a href="install.html" class="btn btn-primary">Get Started</a></div>
+    <div class="nav-right">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      </button>
+      <a href="install.html" class="btn btn-primary">Get Started</a>
+    </div>
     <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
   <div class="mobile-menu">
@@ -130,6 +185,24 @@
 
       <!-- CONTENT -->
       <div class="docs-content">
+
+        <!-- Mobile TOC (hidden on desktop via CSS) -->
+        <details class="mobile-toc">
+          <summary>Jump to section ↓</summary>
+          <nav>
+            <a href="#quickstart">Quick Start</a>
+            <a href="#auth">Authentication</a>
+            <a href="#cli-flags">CLI Flags</a>
+            <a href="#commands">Commands</a>
+            <a href="#repl">REPL Commands</a>
+            <a href="#config">Configuration</a>
+            <a href="#profiles">Profiles</a>
+            <a href="#env-vars">Env Variables</a>
+            <a href="#mcp">MCP Servers</a>
+            <a href="#security">Security</a>
+            <a href="#termux-ref">Termux</a>
+          </nav>
+        </details>
 
         <div class="docs-section" id="quickstart">
           <h2><span class="gradient-text">Quick Start</span></h2>
