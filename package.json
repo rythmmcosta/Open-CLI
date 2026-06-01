@@ -1,0 +1,54 @@
+{
+  "name": "open-cli",
+  "version": "1.0.0",
+  "description": "A frictionless, multi-model AI CLI for developers",
+  "main": "dist/cli.js",
+  "bin": {
+    "opencli": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts",
+    "start": "node dist/cli.js",
+    "link:global": "npm run build && npm link"
+  },
+  "keywords": [
+    "cli",
+    "ai",
+    "claude",
+    "openai",
+    "gemini",
+    "developer-tools"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.3",
+    "@google/generative-ai": "^0.17.1",
+    "boxen": "^5.1.2",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0",
+    "conf": "^10.2.0",
+    "diff": "^5.2.0",
+    "execa": "^5.1.1",
+    "figlet": "^1.7.0",
+    "gradient-string": "^1.2.0",
+    "inquirer": "^8.2.6",
+    "marked": "^4.3.0",
+    "marked-terminal": "^5.2.0",
+    "node-fetch": "^2.7.0",
+    "openai": "^4.52.7",
+    "ora": "^5.4.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/diff": "^5.2.1",
+    "@types/figlet": "^1.5.8",
+    "@types/inquirer": "^8.2.10",
+    "@types/marked": "^5.0.2",
+    "@types/node": "^20.14.0",
+    "@types/node-fetch": "^2.6.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
