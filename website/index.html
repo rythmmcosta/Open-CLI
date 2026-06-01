@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Open CLI — AI Terminal for Developers</title>
-  <meta name="description" content="Open CLI is a free, open-source AI terminal with 20+ built-in skills, browser automation, background agents, and multi-model support for Claude, GPT-4o, Gemini, and Ollama.">
+  <meta name="description" content="Open CLI is a free, open-source AI terminal with 35+ built-in skills, 18 MCP servers, 16 AI providers (Claude, GPT, Gemini, Groq, DeepSeek, Mistral + more), GitHub integration, SQLite project memory, and browser automation.">
   <meta name="keywords" content="AI CLI, AI terminal, developer tools, Claude, GPT-4o, Gemini, Ollama, open source, TypeScript, bash automation">
   <meta name="author" content="Open CLI">
   <meta name="robots" content="index, follow">
@@ -34,7 +34,7 @@
     "name": "Open CLI",
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Linux, macOS, Windows, Android",
-    "description": "Open-source AI-powered terminal tool with 20+ built-in skills, browser automation, background agents, Telegram notifications, and multi-model AI support.",
+    "description": "Open-source AI-powered terminal tool with 35+ built-in skills, 18 MCP servers, 16 AI providers, GitHub integration, SQLite project memory, AI benchmarking, CLI recipes, code timeline, and cross-project search.",
     "url": "https://opencli.myowncloud.tech",
     "downloadUrl": "https://github.com/rythmmcosta/open-cli",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
@@ -201,15 +201,15 @@
         </div>
         <div class="hero-stats">
           <div class="stat-item">
-            <span class="stat-num">20+</span>
+            <span class="stat-num">35+</span>
             <span class="stat-label">Built-in Skills</span>
           </div>
           <div class="stat-item">
-            <span class="stat-num">8</span>
+            <span class="stat-num">18</span>
             <span class="stat-label">MCP Servers</span>
           </div>
           <div class="stat-item">
-            <span class="stat-num">4</span>
+            <span class="stat-num">16</span>
             <span class="stat-label">AI Providers</span>
           </div>
           <div class="stat-item">
@@ -220,10 +220,20 @@
 
         <!-- Provider chips -->
         <div class="providers-row">
-          <span style="font-size:0.78rem;color:var(--text-muted);font-family:var(--font-mono);">Works with:</span>
+          <span style="font-size:0.78rem;color:var(--text-muted);font-family:var(--font-mono);">16 AI providers:</span>
           <div class="provider-chip"><span>🟣</span> Claude</div>
           <div class="provider-chip"><span>🟢</span> GPT-4o</div>
           <div class="provider-chip"><span>🔵</span> Gemini</div>
+          <div class="provider-chip"><span>⚡</span> Groq</div>
+          <div class="provider-chip"><span>🔷</span> DeepSeek</div>
+          <div class="provider-chip"><span>🔴</span> Mistral</div>
+          <div class="provider-chip"><span>🌙</span> Kimi</div>
+          <div class="provider-chip"><span>✕</span> Grok</div>
+          <div class="provider-chip"><span>🟤</span> Cohere</div>
+          <div class="provider-chip"><span>🔍</span> Perplexity</div>
+          <div class="provider-chip"><span>🤗</span> HuggingFace</div>
+          <div class="provider-chip"><span>☁️</span> Azure</div>
+          <div class="provider-chip"><span>🟠</span> Bedrock</div>
           <div class="provider-chip"><span>🦙</span> Ollama</div>
         </div>
       </div>
@@ -283,48 +293,63 @@
     <div class="cards-grid">
       <div class="card">
         <div class="feature-icon-wrap icon-green">🧠</div>
-        <h3>Multi-Model AI</h3>
-        <p>Switch between Claude, GPT-4o, Gemini, and local Ollama models with a single flag. No vendor lock-in.</p>
+        <h3>16 AI Providers</h3>
+        <p>Claude, GPT-4o, Gemini, Groq, DeepSeek, Mistral, Cohere, Perplexity, xAI Grok, Kimi, Together, Cerebras, HuggingFace, Azure, Bedrock, Ollama.</p>
       </div>
       <div class="card">
         <div class="feature-icon-wrap icon-blue">⚡</div>
-        <h3>20 Built-in Skills</h3>
-        <p>Deep system prompts for Vue, React, Python, Rust, Docker, TypeScript, GSAP, and more. Expert mode per domain.</p>
+        <h3>35 Built-in Skills</h3>
+        <p>Expert prompts for Vue, React, Next.js, Go, Java, C#, AWS, Kubernetes, Flutter, ML, GraphQL, Svelte, Prisma, Nginx, Regex and more.</p>
       </div>
       <div class="card">
         <div class="feature-icon-wrap icon-purple">👁️</div>
         <h3>Browser Automation</h3>
-        <p>Playwright-powered "eyes" that verify buttons, forms, scroll behavior and take screenshots of your live UI.</p>
+        <p>Playwright-powered eyes that verify buttons, forms, scroll behavior and take screenshots of your live UI automatically.</p>
       </div>
       <div class="card">
         <div class="feature-icon-wrap icon-yellow">🤖</div>
         <h3>Background Agents</h3>
-        <p>Define scheduled agents that run tasks while you sleep. Cron triggers, event-driven, or manual fire.</p>
+        <p>Define scheduled agents that run tasks while you sleep. Cron triggers, file watchers, event-driven or manual fire.</p>
       </div>
       <div class="card">
-        <div class="feature-icon-wrap icon-green">🔔</div>
-        <h3>Telegram & Discord</h3>
-        <p>Get notified on your phone when long-running tasks complete. Works with Telegram Bot and Discord Webhooks.</p>
+        <div class="feature-icon-wrap icon-green">🐙</div>
+        <h3>GitHub Integration</h3>
+        <p>Connect repos, push/pull code, create PRs and issues — all from the terminal. Each project saves its GitHub connection.</p>
       </div>
       <div class="card">
         <div class="feature-icon-wrap icon-blue">🔌</div>
-        <h3>8 Built-in MCPs</h3>
-        <p>Filesystem, Shell, Git, HTTP, Database (SQLite), Docker, Web Search, and Browser tools — no downloads needed.</p>
+        <h3>18 Built-in MCPs</h3>
+        <p>GitHub, Email, Redis, PostgreSQL, MongoDB, Slack, Jira, PDF, CSV, Clipboard + 8 core servers. Zero downloads needed.</p>
       </div>
       <div class="card">
-        <div class="feature-icon-wrap icon-purple">🛡️</div>
+        <div class="feature-icon-wrap icon-purple">💾</div>
+        <h3>Project Memory</h3>
+        <p>SQLite persists every session, message, tool call, file change, and usage stat. Search history across all projects instantly.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon-wrap icon-yellow">📋</div>
+        <h3>CLI Recipes</h3>
+        <p>Save multi-step AI workflows as named recipes. Run them with one command. Tracks run history and success rates.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon-wrap icon-green">⏱️</div>
+        <h3>Code Timeline</h3>
+        <p>Every file write is versioned. View full change history and roll back any file to any previous state in one command.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon-wrap icon-blue">📊</div>
+        <h3>AI Benchmark</h3>
+        <p>Run any prompt across multiple models simultaneously. Compare speed, tokens, cost, and quality side by side.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon-wrap icon-purple">💰</div>
+        <h3>Cost Dashboard</h3>
+        <p>Real-time token usage and cost estimates per model and project. Know exactly what you're spending on AI.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon-wrap icon-yellow">🛡️</div>
         <h3>Safety Sandbox</h3>
-        <p>3-tier risk scoring on every command. Auto-approve safe reads, prompt on destructive ops, force confirm on wipes.</p>
-      </div>
-      <div class="card">
-        <div class="feature-icon-wrap icon-yellow">📱</div>
-        <h3>Termux / Android</h3>
-        <p>Full CLI works on Android Termux. Use your phone as a remote terminal connected to your home server.</p>
-      </div>
-      <div class="card">
-        <div class="feature-icon-wrap icon-green">💬</div>
-        <h3>Interactive REPL</h3>
-        <p>Persistent conversation context, slash commands, profiles, history, and live streaming responses.</p>
+        <p>3-tier risk scoring on every command. Auto-approve safe reads, prompt on medium risk, force-confirm on destructive ops.</p>
       </div>
     </div>
   </div>

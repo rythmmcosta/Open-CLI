@@ -73,11 +73,11 @@
 
   <!-- Badges row -->
   <rect x="80" y="310" width="120" height="32" rx="16" fill="rgba(0,204,126,0.1)" stroke="rgba(0,204,126,0.25)" stroke-width="1"/>
-  <text x="140" y="331" font-family="'JetBrains Mono', monospace" font-size="13" fill="#00cc7e" text-anchor="middle">20 Skills</text>
-  <rect x="212" y="310" width="130" height="32" rx="16" fill="rgba(0,180,216,0.1)" stroke="rgba(0,180,216,0.25)" stroke-width="1"/>
-  <text x="277" y="331" font-family="'JetBrains Mono', monospace" font-size="13" fill="#00b4d8" text-anchor="middle">8 MCP Servers</text>
-  <rect x="354" y="310" width="130" height="32" rx="16" fill="rgba(155,95,232,0.1)" stroke="rgba(155,95,232,0.25)" stroke-width="1"/>
-  <text x="419" y="331" font-family="'JetBrains Mono', monospace" font-size="13" fill="#9b5fe8" text-anchor="middle">4 AI Providers</text>
+  <text x="140" y="331" font-family="'JetBrains Mono', monospace" font-size="13" fill="#00cc7e" text-anchor="middle">35 Skills</text>
+  <rect x="212" y="310" width="140" height="32" rx="16" fill="rgba(0,180,216,0.1)" stroke="rgba(0,180,216,0.25)" stroke-width="1"/>
+  <text x="282" y="331" font-family="'JetBrains Mono', monospace" font-size="13" fill="#00b4d8" text-anchor="middle">18 MCP Servers</text>
+  <rect x="364" y="310" width="145" height="32" rx="16" fill="rgba(155,95,232,0.1)" stroke="rgba(155,95,232,0.25)" stroke-width="1"/>
+  <text x="436" y="331" font-family="'JetBrains Mono', monospace" font-size="13" fill="#9b5fe8" text-anchor="middle">16 AI Providers</text>
   <rect x="496" y="310" width="120" height="32" rx="16" fill="rgba(0,204,126,0.1)" stroke="rgba(0,204,126,0.25)" stroke-width="1"/>
   <text x="556" y="331" font-family="'JetBrains Mono', monospace" font-size="13" fill="#00cc7e" text-anchor="middle">Open Source</text>
 

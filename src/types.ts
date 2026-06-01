@@ -72,6 +72,19 @@ export interface ProviderConfig {
   openai?: { apiKey: string };
   gemini?: { apiKey: string };
   ollama?: { baseUrl: string };
+  mistral?: { apiKey: string };
+  groq?: { apiKey: string };
+  moonshot?: { apiKey: string };
+  xai?: { apiKey: string };
+  deepseek?: { apiKey: string };
+  together?: { apiKey: string };
+  perplexity?: { apiKey: string };
+  cerebras?: { apiKey: string };
+  huggingface?: { apiKey: string };
+  cohere?: { apiKey: string };
+  azure?: { apiKey: string; endpoint: string; deploymentName: string; apiVersion?: string };
+  bedrock?: { accessKeyId: string; secretAccessKey: string; region: string; sessionToken?: string };
+  github?: { token: string };
 }
 
 export interface ProfileConfig {

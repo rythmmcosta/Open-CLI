@@ -1,8 +1,8 @@
 /**
  * Built-in MCP (Model Context Protocol) Server Registry
+ * Open CLI — opencli.myowncloud.tech — Author: Rythmm Costa
  *
- * These MCP-compatible tool servers are bundled with Open CLI.
- * No external downloads required.
+ * 18 built-in MCP servers — no external downloads required.
  */
 
 import { ToolDef } from '../types';
@@ -29,14 +29,28 @@ export type MCPCategory =
   | 'network'
   | 'notifications'
   | 'devtools'
-  | 'ai';
+  | 'ai'
+  | 'integrations'
+  | 'data'
+  | 'cloud';
 
 import { httpTools } from './http';
 import { databaseTools } from './database';
 import { dockerTools } from './docker';
 import { searchTools } from './search';
+import { githubTools } from './github';
+import { emailTools } from './email';
+import { redisTools } from './redis-mcp';
+import { postgresTools } from './postgres';
+import { mongoTools } from './mongodb';
+import { slackTools } from './slack';
+import { clipboardTools } from './clipboard';
+import { pdfTools } from './pdf';
+import { csvTools } from './csv-tools';
+import { jiraTools } from './jira';
 
 export const BUILTIN_MCP_SERVERS: MCPServer[] = [
+  // ── Core 8 ──────────────────────────────────────────────────────────────
   {
     id: 'filesystem',
     name: 'File System',
@@ -102,6 +116,102 @@ export const BUILTIN_MCP_SERVERS: MCPServer[] = [
     version: '1.0.0',
     category: 'network',
     tools: searchTools,
+  },
+
+  // ── New 10 ──────────────────────────────────────────────────────────────
+  {
+    id: 'github',
+    name: 'GitHub Integration',
+    description: 'GitHub repos, issues, PRs, file contents via REST API v3',
+    version: '1.0.0',
+    category: 'integrations',
+    requiresSetup: true,
+    setupInstructions: 'Run: opencli auth — select GitHub and enter your Personal Access Token',
+    tools: githubTools,
+  },
+  {
+    id: 'email',
+    name: 'Email (SMTP)',
+    description: 'Send emails via any SMTP server using a connection URL',
+    version: '1.0.0',
+    category: 'integrations',
+    requiresSetup: true,
+    setupInstructions: 'Provide SMTP URL: smtp://user:pass@smtp.gmail.com:587',
+    tools: emailTools,
+  },
+  {
+    id: 'redis',
+    name: 'Redis Cache',
+    description: 'Redis get/set/del/list/hash/pub-sub operations',
+    version: '1.0.0',
+    category: 'database',
+    requiresSetup: true,
+    setupInstructions: 'Install: npm install -g ioredis  |  Provide redis:// URL',
+    tools: redisTools,
+  },
+  {
+    id: 'postgres',
+    name: 'PostgreSQL',
+    description: 'Query PostgreSQL: SELECT, INSERT, schema inspection, migrations',
+    version: '1.0.0',
+    category: 'database',
+    requiresSetup: true,
+    setupInstructions: 'Install: npm install -g pg  |  Provide PostgreSQL connection URL',
+    tools: postgresTools,
+  },
+  {
+    id: 'mongodb',
+    name: 'MongoDB',
+    description: 'MongoDB CRUD: find, insert, update, delete, aggregate, collections',
+    version: '1.0.0',
+    category: 'database',
+    requiresSetup: true,
+    setupInstructions: 'Install: npm install -g mongodb  |  Provide mongodb:// URI',
+    tools: mongoTools,
+  },
+  {
+    id: 'slack',
+    name: 'Slack',
+    description: 'Send messages, list channels, read channel history via Slack API',
+    version: '1.0.0',
+    category: 'integrations',
+    requiresSetup: true,
+    setupInstructions: 'Get a Slack Bot token or Incoming Webhook URL from api.slack.com',
+    tools: slackTools,
+  },
+  {
+    id: 'clipboard',
+    name: 'Clipboard',
+    description: 'Read from and write to the system clipboard (macOS, Linux, Windows)',
+    version: '1.0.0',
+    category: 'devtools',
+    tools: clipboardTools,
+  },
+  {
+    id: 'pdf',
+    name: 'PDF Tools',
+    description: 'Create print-ready PDFs and extract text from PDF files',
+    version: '1.0.0',
+    category: 'data',
+    tools: pdfTools,
+  },
+  {
+    id: 'csv',
+    name: 'CSV Tools',
+    description: 'Parse, filter, aggregate, and transform CSV files — zero dependencies',
+    version: '1.0.0',
+    category: 'data',
+    tools: csvTools,
+  },
+  {
+    id: 'jira',
+    name: 'Jira',
+    description: 'Jira Cloud: list issues, create/update issues, add comments, manage transitions',
+    version: '1.0.0',
+    category: 'integrations',
+    requiresSetup: true,
+    setupInstructions: 'Provide Jira host (e.g. company.atlassian.net), account email, and API token',
+    tools: jiraTools,
   },
 ];
 

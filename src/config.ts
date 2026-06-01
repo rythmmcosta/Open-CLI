@@ -63,10 +63,15 @@ export function getConfigPath(): string {
   return getStore().path;
 }
 
-export function setApiKey(provider: 'anthropic' | 'openai' | 'gemini', apiKey: string): void {
+export type SimpleProviderKey =
+  | 'anthropic' | 'openai' | 'gemini'
+  | 'mistral' | 'groq' | 'moonshot' | 'xai' | 'deepseek'
+  | 'together' | 'perplexity' | 'cerebras' | 'huggingface' | 'cohere';
+
+export function setApiKey(provider: SimpleProviderKey, apiKey: string): void {
   const store = getStore();
   const providers = store.get('providers') || {};
-  providers[provider] = { apiKey };
+  (providers as Record<string, { apiKey: string }>)[provider] = { apiKey };
   store.set('providers', providers);
 }
 
@@ -77,10 +82,31 @@ export function setOllamaUrl(baseUrl: string): void {
   store.set('providers', providers);
 }
 
-export function removeProvider(provider: 'anthropic' | 'openai' | 'gemini' | 'ollama'): void {
+export function setAzureConfig(apiKey: string, endpoint: string, deploymentName: string, apiVersion?: string): void {
   const store = getStore();
   const providers = store.get('providers') || {};
-  delete providers[provider];
+  providers.azure = { apiKey, endpoint, deploymentName, apiVersion: apiVersion || '2024-02-01' };
+  store.set('providers', providers);
+}
+
+export function setBedrockConfig(accessKeyId: string, secretAccessKey: string, region: string, sessionToken?: string): void {
+  const store = getStore();
+  const providers = store.get('providers') || {};
+  providers.bedrock = { accessKeyId, secretAccessKey, region, sessionToken };
+  store.set('providers', providers);
+}
+
+export function setGithubToken(token: string): void {
+  const store = getStore();
+  const providers = store.get('providers') || {};
+  providers.github = { token };
+  store.set('providers', providers);
+}
+
+export function removeProvider(provider: keyof import('./types').ProviderConfig): void {
+  const store = getStore();
+  const providers = store.get('providers') || {};
+  delete (providers as Record<string, unknown>)[provider];
   store.set('providers', providers);
 }
 

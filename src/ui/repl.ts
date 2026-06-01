@@ -361,6 +361,84 @@ async function handleCommand(input: string, context: ConversationContext, option
       showDivider();
       break;
 
+    // ── GitHub ────────────────────────────────────────────
+    case 'github': {
+      const { runGithubCommand } = await import('../github');
+      await runGithubCommand(args);
+      break;
+    }
+
+    // ── Project ───────────────────────────────────────────
+    case 'project': {
+      const { runProjectCommand } = await import('../commands/project');
+      runProjectCommand(args);
+      break;
+    }
+
+    // ── Benchmark ─────────────────────────────────────────
+    case 'benchmark': {
+      const prompt = args.join(' ');
+      if (!prompt) { showWarning('Usage: /benchmark <prompt>'); break; }
+      const { runBenchmark } = await import('../commands/benchmark');
+      const cfg = getConfig();
+      const models = [cfg.defaultModel, 'gpt-4o-mini', 'gemini-2.0-flash'].filter(Boolean);
+      await runBenchmark(prompt, models, cfg);
+      break;
+    }
+
+    // ── Recipe ────────────────────────────────────────────
+    case 'recipe': {
+      const sub = args[0];
+      if (!sub || sub === 'list') {
+        const { listRecipesCmd } = await import('../commands/recipe');
+        await listRecipesCmd();
+      } else if (sub === 'create') {
+        const { createRecipeInteractive } = await import('../commands/recipe');
+        await createRecipeInteractive();
+      } else if (sub === 'run') {
+        const name = args[1];
+        if (!name) { showWarning('Usage: /recipe run <name>'); break; }
+        const { runRecipe } = await import('../commands/recipe');
+        await runRecipe(name, getConfig());
+      } else if (sub === 'delete') {
+        const name = args[1];
+        if (!name) { showWarning('Usage: /recipe delete <name>'); break; }
+        const { deleteRecipeCmd } = await import('../commands/recipe');
+        await deleteRecipeCmd(name);
+      } else {
+        showInfo('Usage: /recipe [list|create|run <name>|delete <name>]');
+      }
+      break;
+    }
+
+    // ── Timeline ──────────────────────────────────────────
+    case 'timeline': {
+      const { showTimeline, doRollback } = await import('../commands/timeline');
+      const sub = args[0];
+      if (sub === 'rollback') {
+        const id = parseInt(args[1], 10);
+        if (isNaN(id)) { showWarning('Usage: /timeline rollback <id>'); break; }
+        await doRollback(id);
+      } else {
+        await showTimeline(sub);
+      }
+      break;
+    }
+
+    // ── Cross-project search ──────────────────────────────
+    case 'search': {
+      const { runProjectSearchCommand } = await import('../commands/project-search');
+      runProjectSearchCommand(args);
+      break;
+    }
+
+    // ── Costs dashboard ───────────────────────────────────
+    case 'costs': case 'cost-dashboard': {
+      const { runCostsCommand } = await import('../commands/costs');
+      runCostsCommand(args);
+      break;
+    }
+
     default:
       showWarning(`Unknown command: /${cmd}. Type /help for available commands.`);
   }

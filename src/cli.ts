@@ -220,6 +220,122 @@ notifyCmd
     process.exit(0);
   });
 
+// ── github ────────────────────────────────────────────────────────────
+program
+  .command('github [subcommand] [args...]')
+  .description('GitHub integration: status, connect, push, pull, clone, pr, issues, repos')
+  .action(async (subcommand: string | undefined, args: string[]) => {
+    showMini();
+    const { runGithubCommand } = await import('./github');
+    const fullArgs = subcommand ? [subcommand, ...args] : args;
+    await runGithubCommand(fullArgs);
+    process.exit(0);
+  });
+
+// ── project ───────────────────────────────────────────────────────────
+program
+  .command('project [subcommand] [args...]')
+  .description('Project management: status, init, list, note, delete')
+  .action(async (subcommand: string | undefined, args: string[]) => {
+    const { runProjectCommand } = await import('./commands/project');
+    const fullArgs = subcommand ? [subcommand, ...args] : args;
+    runProjectCommand(fullArgs);
+    process.exit(0);
+  });
+
+// ── benchmark ─────────────────────────────────────────────────────────
+program
+  .command('benchmark <prompt>')
+  .description('Benchmark a prompt across multiple AI models')
+  .option('-m, --models <list>', 'Comma-separated list of models to compare')
+  .action(async (prompt: string, opts: Record<string, string>) => {
+    showMini();
+    const { runBenchmark } = await import('./commands/benchmark');
+    const config = getConfig();
+    const models = opts.models
+      ? opts.models.split(',').map(s => s.trim())
+      : [config.defaultModel, 'gpt-4o-mini', 'gemini-2.0-flash'].filter(Boolean);
+    await runBenchmark(prompt, models, config);
+    process.exit(0);
+  });
+
+// ── recipe ────────────────────────────────────────────────────────────
+const recipeCmd = program.command('recipe').description('CLI recipe system: save and run AI workflows');
+
+recipeCmd
+  .command('list')
+  .description('List all saved recipes')
+  .action(async () => {
+    const { listRecipesCmd } = await import('./commands/recipe');
+    await listRecipesCmd();
+    process.exit(0);
+  });
+
+recipeCmd
+  .command('create')
+  .description('Create a new recipe interactively')
+  .action(async () => {
+    showMini();
+    const { createRecipeInteractive } = await import('./commands/recipe');
+    await createRecipeInteractive();
+    process.exit(0);
+  });
+
+recipeCmd
+  .command('run <name>')
+  .description('Run a saved recipe')
+  .action(async (name: string) => {
+    showMini();
+    const { runRecipe } = await import('./commands/recipe');
+    const config = getConfig();
+    await runRecipe(name, config);
+    process.exit(0);
+  });
+
+recipeCmd
+  .command('delete <name>')
+  .description('Delete a recipe')
+  .action(async (name: string) => {
+    const { deleteRecipeCmd } = await import('./commands/recipe');
+    await deleteRecipeCmd(name);
+    process.exit(0);
+  });
+
+// ── timeline ──────────────────────────────────────────────────────────
+program
+  .command('timeline [file]')
+  .description('Show file change history and rollback')
+  .option('-r, --rollback <id>', 'Rollback to a specific history entry')
+  .action(async (file: string | undefined, opts: Record<string, string>) => {
+    const { showTimeline, doRollback } = await import('./commands/timeline');
+    if (opts.rollback) {
+      await doRollback(parseInt(opts.rollback, 10));
+    } else {
+      await showTimeline(file);
+    }
+    process.exit(0);
+  });
+
+// ── search ────────────────────────────────────────────────────────────
+program
+  .command('search <query>')
+  .description('Full-text search across all project message history')
+  .action((query: string) => {
+    const { runProjectSearchCommand } = require('./commands/project-search');
+    runProjectSearchCommand([query]);
+    process.exit(0);
+  });
+
+// ── costs ─────────────────────────────────────────────────────────────
+program
+  .command('costs [days]')
+  .description('AI cost dashboard — show token usage and estimated costs')
+  .action((days: string | undefined) => {
+    const { runCostsCommand } = require('./commands/costs');
+    runCostsCommand(days ? [days] : []);
+    process.exit(0);
+  });
+
 // ── config ────────────────────────────────────────────────────────────
 program
   .command('config')
@@ -327,11 +443,12 @@ program.action(async (prompt: string | undefined, opts: Record<string, unknown>)
 });
 
 function hasAnyProvider(config: ReturnType<typeof getConfig>): boolean {
+  const p = config.providers;
   return !!(
-    config.providers.anthropic?.apiKey ||
-    config.providers.openai?.apiKey ||
-    config.providers.gemini?.apiKey ||
-    config.providers.ollama?.baseUrl
+    p.anthropic?.apiKey || p.openai?.apiKey || p.gemini?.apiKey || p.ollama?.baseUrl ||
+    p.mistral?.apiKey || p.groq?.apiKey || p.moonshot?.apiKey || p.xai?.apiKey ||
+    p.deepseek?.apiKey || p.together?.apiKey || p.perplexity?.apiKey || p.cerebras?.apiKey ||
+    p.huggingface?.apiKey || p.cohere?.apiKey || p.azure?.apiKey || p.bedrock?.accessKeyId
   );
 }
 

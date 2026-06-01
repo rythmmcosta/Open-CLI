@@ -7,6 +7,16 @@ import { httpTools, executeHttpRequest } from '../mcp/http';
 import { databaseTools, executeDatabaseTool } from '../mcp/database';
 import { dockerTools, executeDockerTool } from '../mcp/docker';
 import { searchTools, executeSearchTool } from '../mcp/search';
+import { githubTools, executeGithubTool } from '../mcp/github';
+import { emailTools, executeEmailTool } from '../mcp/email';
+import { redisTools, executeRedisTool } from '../mcp/redis-mcp';
+import { postgresTools, executePostgresTool } from '../mcp/postgres';
+import { mongoTools, executeMongoTool } from '../mcp/mongodb';
+import { slackTools, executeSlackTool } from '../mcp/slack';
+import { clipboardTools, executeClipboardTool } from '../mcp/clipboard';
+import { pdfTools, executePdfTool } from '../mcp/pdf';
+import { csvTools, executeCsvTool } from '../mcp/csv-tools';
+import { jiraTools, executeJiraTool } from '../mcp/jira';
 
 export const ALL_TOOLS: ToolDef[] = [
   shellToolDef,
@@ -19,6 +29,16 @@ export const ALL_TOOLS: ToolDef[] = [
   ...databaseTools,
   ...dockerTools,
   ...searchTools,
+  ...githubTools,
+  ...emailTools,
+  ...redisTools,
+  ...postgresTools,
+  ...mongoTools,
+  ...slackTools,
+  ...clipboardTools,
+  ...pdfTools,
+  ...csvTools,
+  ...jiraTools,
 ];
 
 export const BROWSER_ENABLED_TOOLS: ToolDef[] = [
@@ -41,7 +61,7 @@ export async function executeTool(
     return executeHttpRequest(input);
   }
 
-  // Database tools
+  // Database (SQLite) tools
   if (name.startsWith('db_')) {
     return executeDatabaseTool(name, input);
   }
@@ -51,9 +71,59 @@ export async function executeTool(
     return executeDockerTool(name, input);
   }
 
-  // Search tools
+  // Web search / fetch
   if (name === 'web_search' || name === 'fetch_page') {
     return executeSearchTool(name, input);
+  }
+
+  // GitHub MCP tools
+  if (name.startsWith('github_')) {
+    return executeGithubTool(name, input);
+  }
+
+  // Email tools
+  if (name.startsWith('email_')) {
+    return executeEmailTool(name, input);
+  }
+
+  // Redis tools
+  if (name.startsWith('redis_')) {
+    return executeRedisTool(name, input);
+  }
+
+  // PostgreSQL tools
+  if (name.startsWith('pg_')) {
+    return executePostgresTool(name, input);
+  }
+
+  // MongoDB tools
+  if (name.startsWith('mongo_')) {
+    return executeMongoTool(name, input);
+  }
+
+  // Slack tools
+  if (name.startsWith('slack_')) {
+    return executeSlackTool(name, input);
+  }
+
+  // Clipboard tools
+  if (name.startsWith('clipboard_')) {
+    return executeClipboardTool(name, input);
+  }
+
+  // PDF tools
+  if (name.startsWith('pdf_')) {
+    return executePdfTool(name, input);
+  }
+
+  // CSV tools
+  if (name.startsWith('csv_')) {
+    return executeCsvTool(name, input);
+  }
+
+  // Jira tools
+  if (name.startsWith('jira_')) {
+    return executeJiraTool(name, input);
   }
 
   switch (name) {

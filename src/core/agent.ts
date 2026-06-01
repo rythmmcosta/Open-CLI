@@ -20,6 +20,14 @@ import {
 } from '../ui/display';
 import { AppConfig, MessageContent } from '../types';
 
+// DB persistence — lazy-loaded, fails gracefully if SQLite unavailable
+let dbEnabled = true;
+function tryDb<T>(fn: () => T): T | null {
+  if (!dbEnabled) return null;
+  try { return fn(); }
+  catch { dbEnabled = false; return null; }
+}
+
 const MAX_TOOL_ITERATIONS = 15;
 
 export interface AgentOptions {
@@ -44,9 +52,26 @@ export async function runAgent(
 
   const provider = getProvider(model, config);
 
-  context.addUserMessage(query);
-  let messages = context.getMessages();
+  // ── DB: init project + session ────────────────────────────────────────────
+  let sessionId: string | null = null;
+  let projectId: string | null = null;
+  tryDb(() => {
+    const { upsertProject } = require('../db/projects');
+    const { createSession } = require('../db/sessions');
+    const project = upsertProject(process.cwd());
+    projectId = project.id;
+    sessionId = createSession(project.id, model, config.activeSkill);
+  });
 
+  context.addUserMessage(query);
+
+  // ── DB: save user message ─────────────────────────────────────────────────
+  tryDb(() => {
+    const { saveMessage } = require('../db/messages');
+    saveMessage({ sessionId, projectId, role: 'user', content: query });
+  });
+
+  let messages = context.getMessages();
   let iteration = 0;
 
   while (iteration < MAX_TOOL_ITERATIONS) {
@@ -79,6 +104,20 @@ export async function runAgent(
 
     if (response.usage) {
       context.updateUsage(response.usage.inputTokens, response.usage.outputTokens);
+
+      // ── DB: record usage stats ──────────────────────────────────────────
+      tryDb(() => {
+        const { recordUsage, estimateCost } = require('../db/usage');
+        const cost = estimateCost(model, response.usage!.inputTokens, response.usage!.outputTokens);
+        recordUsage({
+          projectId,
+          model,
+          provider: model.split('-')[0],
+          inputTokens: response.usage!.inputTokens,
+          outputTokens: response.usage!.outputTokens,
+          costUsd: cost,
+        });
+      });
     }
 
     if (response.text && !firstToken) {
@@ -93,6 +132,14 @@ export async function runAgent(
         process.stdout.write(lines[i]);
       }
       printResponseSuffix();
+    }
+
+    // ── DB: save assistant message ────────────────────────────────────────
+    if (response.text) {
+      tryDb(() => {
+        const { saveMessage } = require('../db/messages');
+        saveMessage({ sessionId, projectId, role: 'assistant', content: response.text });
+      });
     }
 
     const rawContent = response.rawContent || (
@@ -129,11 +176,7 @@ export async function runAgent(
             message: chalk.hex('#ff6b6b').bold('HIGH RISK: Type "yes" to confirm or press Enter to skip:'),
           }]);
           if (confirm.toLowerCase() !== 'yes') {
-            toolResults.push({
-              toolUseId: toolCall.id,
-              content: 'User rejected this action.',
-              isError: false,
-            });
+            toolResults.push({ toolUseId: toolCall.id, content: 'User rejected this action.', isError: false });
             continue;
           }
         } else {
@@ -143,13 +186,8 @@ export async function runAgent(
             message: chalk.hex('#ffb300')('Execute this command?'),
             default: true,
           }]);
-
           if (!approved) {
-            toolResults.push({
-              toolUseId: toolCall.id,
-              content: 'User rejected this action.',
-              isError: false,
-            });
+            toolResults.push({ toolUseId: toolCall.id, content: 'User rejected this action.', isError: false });
             continue;
           }
         }
@@ -159,8 +197,25 @@ export async function runAgent(
         console.log(C.dim(`  [Tool input]: ${JSON.stringify(toolCall.input)}`));
       }
 
+      const startMs = Date.now();
       const result = await executeTool(toolCall.name, toolCall.input, config.dryRun);
+      const durationMs = Date.now() - startMs;
+
       showToolResult(result.output, result.isError);
+
+      // ── DB: log tool call ───────────────────────────────────────────────
+      tryDb(() => {
+        const { logToolCall } = require('../db/tool-log');
+        logToolCall({
+          sessionId,
+          projectId,
+          toolName: toolCall.name,
+          input: toolCall.input,
+          output: result.output.slice(0, 2000),
+          isError: result.isError,
+          durationMs,
+        });
+      });
 
       toolResults.push({
         toolUseId: toolCall.id,
@@ -176,4 +231,15 @@ export async function runAgent(
   if (iteration >= MAX_TOOL_ITERATIONS) {
     showError('Reached maximum tool iterations. Stopping agent loop.');
   }
+
+  // ── DB: close session ─────────────────────────────────────────────────────
+  tryDb(() => {
+    if (!sessionId) return;
+    const { closeSession } = require('../db/sessions');
+    closeSession(sessionId, {
+      inputTokens: context.stats.totalInputTokens,
+      outputTokens: context.stats.totalOutputTokens,
+      costUsd: 0,
+    });
+  });
 }
