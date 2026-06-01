@@ -1,92 +1,103 @@
 # ⚡ Open CLI
 
-> A frictionless, multi-model AI CLI that translates natural language into terminal commands, file edits, and system operations.
+> **opencli.myowncloud.tech** — A frictionless, multi-model AI terminal for developers
 
 ```bash
 opencli "find all TypeScript files modified today"
 opencli --model gpt-4o "explain this codebase"
 opencli --skill vuejs "create a reactive todo list with Pinia"
+opencli --notify "run the test suite and report results"
 cat error.log | opencli "what caused this crash?"
+opencli browser screenshot https://myapp.com
+opencli agent create   # set up a background coding agent
 ```
 
 ## Quick Start
 
 ```bash
-# 1. Install
 git clone https://github.com/rythmmcosta/open-cli.git
 cd open-cli
 npm install && npm run build && npm link
 
-# 2. Add API key
-opencli auth
-
-# 3. Start using
-opencli "list all .ts files"
-opencli  # interactive REPL mode
+opencli auth        # Add API keys
+opencli             # Start interactive REPL
 ```
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| **Multi-model** | Claude, GPT-4o, Gemini, Ollama (local/free) |
+| **20 Skills** | vue, react, gsap, php, python, rust, docker, testing, and more |
+| **Browser Eyes** | Playwright automation: navigate, screenshot, verify, extract |
+| **Agent System** | 9 agent types running in background with notifications |
+| **8 MCP Servers** | filesystem, shell, git, browser, http, database, docker, search |
+| **Notifications** | Telegram + Discord for remote monitoring |
+| **Safety Sandbox** | 3-tier risk scoring on every command |
+| **Pipe mode** | `cat file | opencli "analyze this"` |
+
+## Documentation
+
+| Doc | Description |
+|-----|-------------|
+| [Installation](docs/INSTALLATION.md) | Full setup guide |
+| [Skills](docs/SKILLS.md) | All 20 built-in skills |
+| [MCP Servers](docs/MCP-SERVERS.md) | Built-in MCP servers reference |
+| [Browser Automation](docs/BROWSER-AUTOMATION.md) | Playwright integration guide |
+| [Agent System](docs/AGENT-SYSTEM.md) | Background agents setup |
+| [Notifications](docs/NOTIFICATIONS.md) | Telegram & Discord setup |
+| [Configuration](docs/CONFIGURATION.md) | Config file reference |
+| [CLI Flags](docs/CLI-FLAGS.md) | All command-line options |
+| [Security](docs/SECURITY.md) | Safety sandbox details |
 
 ## Providers
 
-| Provider | Models | Setup |
-|----------|--------|-------|
-| **Anthropic** | claude-opus-4-5, claude-sonnet-4-5 | `opencli auth` |
-| **OpenAI** | gpt-4o, gpt-4o-mini, o1 | `opencli auth` |
-| **Gemini** | gemini-2.0-flash, gemini-1.5-pro | `opencli auth` |
-| **Ollama** | llama3.2, codellama, mistral | `ollama serve` |
+```bash
+opencli auth   # Interactive provider setup
+```
 
-## Built-in Skills
-
-Switch skills with `/skill <name>` in the REPL or `--skill <name>` flag:
-
-| Skill | Description |
-|-------|-------------|
-| `vibe-coding` | Creative AI-first development, rapid iteration |
-| `vuejs` | Vue 3 + Composition API + Pinia + Vue Router |
-| `react` | React 18 + Next.js 14 + Server Components |
-| `javascript` | Vanilla JS, ES2024+, Web APIs |
-| `html-css` | Semantic HTML5, modern CSS, animations |
-| `gsap` | GSAP 3, ScrollTrigger, timelines |
-| `php` | PHP 8.2+, Laravel, WordPress |
-| `nodejs` | Node.js, Express, Fastify, APIs |
-| `git` | Git workflows, GitHub, CI/CD |
+| Provider | Models | Config |
+|----------|--------|--------|
+| **Anthropic** | claude-opus-4-5, claude-sonnet-4-5 | API key |
+| **OpenAI** | gpt-4o, gpt-4o-mini, o1-preview | API key |
+| **Gemini** | gemini-2.0-flash, gemini-1.5-pro | API key |
+| **Ollama** | llama3.2, codellama, mistral | Local server |
 
 ## CLI Flags
 
 ```
---model, -m   AI model (claude-opus-4-5, gpt-4o, gemini-2.0-flash, ollama:llama3.2)
---skill, -s   Built-in skill
---yes, -y     Auto-approve low-risk commands
---dry-run     Preview commands without executing
---profile, -p Named profile from config
---show-cost   Display token usage and cost
---verbose     Show raw tool calls
---context, -c Inject a file into context
+opencli [prompt] [options]
+
+  -m, --model <name>    AI model
+  -s, --skill <name>    Built-in skill
+  -y, --yes             Auto-approve low-risk commands
+  --dry-run             Preview without executing
+  -p, --profile <name>  Named config profile
+  --show-cost           Show token usage
+  --browser             Enable browser tools
+  --notify              Send notification when done
+  -v, --verbose         Show tool calls
+  -c, --context <file>  Inject file into context
 ```
 
 ## REPL Commands
 
 ```
-/auth          Manage API keys and providers
-/model <name>  Switch AI model
-/skill <name>  Activate a built-in skill
-/skills        List all skills
-/profile <n>   Apply a saved profile
-/clear         Clear the screen
-/history       Show conversation history
-/cost          Show session token usage
-/reset         Clear conversation history
-/help          Show help
-/exit          Exit
+/auth           Manage providers
+/model <name>   Switch model
+/skill <name>   Activate skill
+/skills         List all skills
+/mcp list       List MCP servers
+/browser        Browser commands
+/agent          Agent management
+/notify         Notification setup
+/history        Conversation history
+/cost           Token usage
+/reset          Clear history
+/help           Full command reference
+/exit           Exit
 ```
-
-## Safety Sandbox
-
-Every command is risk-scored before execution:
-
-- **LOW RISK** — Auto-executed with `-y` flag (read-only, safe operations)
-- **MEDIUM RISK** — Always prompts `[Y/n]` (sudo, network calls, global installs)
-- **HIGH RISK** — Requires typing `"yes"` (destructive, irreversible operations)
 
 ## License
 
-MIT
+MIT · [opencli.myowncloud.tech](https://opencli.myowncloud.tech)
