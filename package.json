@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "prepare": "npm run build",
     "dev": "ts-node src/cli.ts",
     "start": "node dist/cli.js",
     "link:global": "npm run build && npm link"
@@ -21,6 +22,8 @@
     "developer-tools"
   ],
   "license": "MIT",
+  "files": ["dist/", "src/", "tsconfig.json"],
+  "engines": { "node": ">=18.0.0" },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.24.3",
     "@google/generative-ai": "^0.17.1",
@@ -48,6 +51,8 @@
     "ora": "^5.4.1",
     "pg": "^8.11.3",
     "playwright": "^1.60.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
     "uuid": "^9.0.1",
     "zod": "^3.23.8"
   },
@@ -62,8 +67,6 @@
     "@types/node-fetch": "^2.6.11",
     "@types/nodemailer": "^6.4.14",
     "@types/pg": "^8.10.9",
-    "@types/uuid": "^10.0.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "@types/uuid": "^10.0.0"
   }
 }

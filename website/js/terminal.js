@@ -128,7 +128,7 @@ const heroSequences = [
 
 // ─── INSTALL TERMINAL SEQUENCE ───
 const installSequences = [
-  { type: 'command', text: 'npm install -g open-cli',       delay: 0.3 },
+  { type: 'command', text: 'npm install -g github:rythmmcosta/open-cli', delay: 0.3 },
   { type: 'info',    text: '⠋ Installing...',               delay: 0.5 },
   { type: 'success', text: '✓ Installed v1.0.0 globally',   delay: 0.8 },
   { type: 'blank',   text: '',                              delay: 0 },

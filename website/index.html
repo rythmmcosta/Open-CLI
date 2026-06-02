@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Open CLI — AI Terminal for Developers</title>
-  <meta name="description" content="Open CLI is a free, open-source AI terminal with 45+ built-in skills, 26 MCP servers, 17 AI providers (Claude, GPT, Gemini, Groq, DeepSeek, Mistral, OpenRouter + more), GitHub integration, SQLite project memory, and browser automation.">
+  <meta name="description" content="Open CLI is a free, open-source AI terminal with 52 built-in skills, 30 MCP servers, 17 AI providers (Claude, GPT, Gemini, Groq, DeepSeek, Mistral, OpenRouter + more), image &amp; video generation, GitHub integration, SQLite project memory, and browser automation.">
   <meta name="keywords" content="AI CLI, AI terminal, developer tools, Claude API, GPT-4 terminal, open source AI, AI command line, multi-model AI, Gemini terminal, coding assistant">
   <meta name="author" content="Rythmm Costa">
   <meta name="copyright" content="Open CLI — opencli.myowncloud.tech">
@@ -15,7 +15,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Open CLI">
   <meta property="og:title" content="Open CLI — AI Terminal for Developers">
-  <meta property="og:description" content="Free, open-source AI terminal with 45+ skills, 26 MCP servers, 17 AI providers, browser automation, background agents, and support for Claude, GPT-4o, Gemini, and more.">
+  <meta property="og:description" content="Free, open-source AI terminal with 52 skills, 30 MCP servers, 17 AI providers, image &amp; video generation, browser automation, background agents, and support for Claude, GPT-4o, Gemini, and more.">
   <meta property="og:image" content="https://opencli.myowncloud.tech/assets/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -37,7 +37,7 @@
     "name": "Open CLI",
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Linux, macOS, Windows, Android",
-    "description": "Open-source AI-powered terminal tool with 45+ built-in skills, 26 MCP servers, 17 AI providers, GitHub integration, SQLite project memory, AI benchmarking, CLI recipes, code timeline, and cross-project search.",
+    "description": "Open-source AI-powered terminal tool with 52 built-in skills, 30 MCP servers, 17 AI providers, image &amp; video generation, GitHub integration, SQLite project memory, AI benchmarking, CLI recipes, code timeline, and cross-project search.",
     "url": "https://opencli.myowncloud.tech",
     "downloadUrl": "https://github.com/rythmmcosta/open-cli",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
@@ -47,8 +47,8 @@
   <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
   {"@type":"Question","name":"Is Open CLI free?","acceptedAnswer":{"@type":"Answer","text":"Yes, completely free and open source under the MIT license. It also works with genuinely free AI tiers: Groq, Google Gemini Flash, HuggingFace, Cohere, and OpenRouter free models — no credit card required."}},
-  {"@type":"Question","name":"Which AI providers does Open CLI support?","acceptedAnswer":{"@type":"Answer","text":"17 providers: Claude (Anthropic), GPT-4o (OpenAI), Gemini (Google), Groq, DeepSeek, Mistral, Cohere, Perplexity, xAI Grok, Kimi (Moonshot), Together AI, Cerebras, HuggingFace, Azure OpenAI, AWS Bedrock, OpenRouter, and Ollama (local/offline)."}},
-  {"@type":"Question","name":"What is an MCP server in Open CLI?","acceptedAnswer":{"@type":"Answer","text":"MCP (Model Context Protocol) servers are built-in tool sets that let AI use external services like GitHub, Slack, PostgreSQL, Redis, MongoDB, Google Drive, S3, FTP, Dropbox, Notion, Linear, Stripe, and Supabase — without any separate downloads."}},
+  {"@type":"Question","name":"Which AI providers does Open CLI support?","acceptedAnswer":{"@type":"Answer","text":"17 text/chat providers: Claude (Anthropic), GPT-4o (OpenAI), Gemini (Google), Groq, DeepSeek, Mistral, Cohere, Perplexity, xAI Grok, Kimi (Moonshot), Together AI, Cerebras, HuggingFace, Azure OpenAI, AWS Bedrock, OpenRouter, and Ollama (local/offline). Plus 6 image and 4 video generation providers."}},
+  {"@type":"Question","name":"What is an MCP server in Open CLI?","acceptedAnswer":{"@type":"Answer","text":"MCP (Model Context Protocol) servers are built-in tool sets that let AI use external services like GitHub, Slack, PostgreSQL, Redis, MongoDB, Google Drive, S3, FTP, Dropbox, Notion, Linear, Stripe, and Supabase — without any separate downloads. Open CLI ships with 30 MCP servers."}},
   {"@type":"Question","name":"Can I run Open CLI on Windows, Mac, and Linux?","acceptedAnswer":{"@type":"Answer","text":"Yes. Open CLI runs anywhere Node.js 18+ runs: macOS, Linux, Windows (WSL or PowerShell), and even Termux on Android."}},
   {"@type":"Question","name":"What is Ensemble Mode?","acceptedAnswer":{"@type":"Answer","text":"Ensemble Mode sends your prompt to all configured AI providers simultaneously, then uses the fastest available model to synthesize the best combined answer. Use opencli --ensemble or /ensemble in the REPL."}}
 ]}
@@ -108,6 +108,124 @@
     }
     .provider-chip:hover { border-color: var(--border-mid); color: var(--text); }
     .provider-chip span { font-size: 0.9rem; }
+
+    /* ─── Terminal showcase ─── */
+    .terminal-showcase { padding: 80px 0; }
+    .terminal-window {
+      background: #0d1421;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      font-family: 'JetBrains Mono', monospace;
+      max-width: 700px;
+      margin: 40px auto 0;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .dot-red    { background: #ff5f57; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green  { background: #28c840; }
+    .terminal-title {
+      margin-left: 8px;
+      font-size: 0.78rem;
+      color: #64748b;
+    }
+    .terminal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 4px; }
+    .terminal-line { font-size: 0.82rem; line-height: 1.7; }
+    .terminal-line .prompt { color: #00cc7e; margin-right: 8px; }
+    .terminal-line .cmd    { color: #e2e8f0; }
+    .terminal-line.output  { padding-left: 0; }
+    .terminal-line.output.green { color: #00cc7e; }
+    .terminal-line.output.blue  { color: #00b4d8; }
+    .terminal-line.output.dim   { color: #64748b; }
+    .blink-cursor {
+      color: #e2e8f0;
+      animation: blink 1.1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ─── Skills Preview ─── */
+    .skills-preview-section { padding: 80px 0; text-align: center; }
+    .skills-preview-section h2 { font-size: clamp(1.6rem,3vw,2.4rem); margin-bottom: 8px; }
+    .skills-scroll-row {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 16px 0;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .skills-scroll-row::-webkit-scrollbar { display: none; }
+    .skill-chip-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--accent, #00cc7e);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+      transition: background 0.2s;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text);
+      cursor: default;
+    }
+    .skill-chip-card:hover { background: rgba(255,255,255,0.07); }
+    .skill-icon { font-size: 1.1rem; }
+    .btn-outline {
+      display: inline-block;
+      margin-top: 28px;
+      padding: 12px 24px;
+      border: 1px solid var(--border-mid);
+      border-radius: 8px;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-outline:hover { border-color: var(--green); color: var(--green); }
+
+    /* ─── Gen AI Section ─── */
+    .gen-ai-section { padding: 80px 0; }
+    .gen-ai-section h2 { font-size: clamp(1.6rem,3vw,2.4rem); margin-bottom: 8px; }
+    .gen-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 40px;
+    }
+    @media(max-width:640px) { .gen-grid { grid-template-columns: 1fr; } }
+    .gen-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 28px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .gen-card:hover { border-color: rgba(0,180,216,0.35); transform: translateY(-3px); }
+    .gen-icon { font-size: 2rem; margin-bottom: 14px; }
+    .gen-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
+    .gen-card p  { font-size: 0.85rem; color: var(--text-dim); line-height: 1.6; margin-bottom: 16px; }
+    .gen-card code {
+      display: block;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 7px;
+      padding: 10px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #00cc7e;
+    }
 
     /* models scroll ticker */
     .model-ticker {
@@ -198,8 +316,7 @@
           <span class="gradient-text">Built for Developers</span>
         </h1>
         <p class="hero-subtitle">
-          Multi-model AI CLI with 20 built-in skills, browser automation, background agents,
-          Telegram notifications, and a blazing fast developer workflow.
+          Multi-model AI CLI with 52 built-in skills, 30 MCP servers, 17 AI providers, image &amp; video generation, browser automation, background agents, and a blazing fast developer workflow.
         </p>
         <div class="hero-actions">
           <a href="install.html" class="btn btn-primary">
@@ -213,11 +330,11 @@
         </div>
         <div class="hero-stats">
           <div class="stat-item">
-            <span class="stat-num">45+</span>
+            <span class="stat-num">52</span>
             <span class="stat-label">Built-in Skills</span>
           </div>
           <div class="stat-item">
-            <span class="stat-num">26</span>
+            <span class="stat-num">30</span>
             <span class="stat-label">MCP Servers</span>
           </div>
           <div class="stat-item">
@@ -310,7 +427,7 @@
       </div>
       <div class="card">
         <div class="feature-icon-wrap icon-blue">⚡</div>
-        <h3>45 Built-in Skills</h3>
+        <h3>52 Built-in Skills</h3>
         <p>Expert prompts for Vue, React, Next.js, Go, Java, C#, AWS, Kubernetes, Flutter, ML, GraphQL, Svelte, Prisma, Nginx, Regex and more.</p>
       </div>
       <div class="card">
@@ -330,7 +447,7 @@
       </div>
       <div class="card">
         <div class="feature-icon-wrap icon-blue">🔌</div>
-        <h3>26 Built-in MCPs</h3>
+        <h3>30 Built-in MCPs</h3>
         <p>GitHub, Email, Redis, PostgreSQL, MongoDB, Slack, Jira, PDF, CSV, Clipboard, Google Drive, S3, FTP, Dropbox, Notion, Linear, Stripe, Supabase + core servers. Zero downloads needed.</p>
       </div>
       <div class="card">
@@ -367,6 +484,87 @@
   </div>
 </section>
 
+<!-- ─── TERMINAL SHOWCASE ─── -->
+<section class="terminal-showcase">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">See it in action</span>
+      <h2>One CLI.<br><span class="gradient-text">Every workflow.</span></h2>
+      <p>Skills, image generation, ensemble mode — all from a single command.</p>
+    </div>
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+        <span class="terminal-title">opencli — ~/my-project</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line"><span class="prompt">❯</span> <span class="cmd">opencli --skill wordpress "create WooCommerce checkout plugin"</span></div>
+        <div class="terminal-line output green">⚡ Skill: WordPress | Model: claude-sonnet-4-6</div>
+        <div class="terminal-line output dim">✓ Written to src/woocommerce-checkout.php (247 lines)</div>
+        <div class="terminal-line output dim">✓ Written to includes/class-checkout-handler.php</div>
+        <div class="terminal-line"><span class="prompt">❯</span> <span class="cmd">opencli --image "dark terminal UI for a tech blog"</span></div>
+        <div class="terminal-line output blue">🎨 Generating via Pollinations (free)...</div>
+        <div class="terminal-line output green">✓ Saved: ./generated/img-1748901234.png</div>
+        <div class="terminal-line"><span class="prompt">❯</span> <span class="cmd">opencli --ensemble "explain microservices vs monolith"</span></div>
+        <div class="terminal-line output dim">[claude ✓] [gpt-4o ✓] [groq ✓] [gemini ✓] [deepseek ✓]</div>
+        <div class="terminal-line output green">✓ Synthesized from 5 models · 4.1s</div>
+        <div class="terminal-line"><span class="prompt">❯</span> <span class="cmd blink-cursor">_</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SKILLS PREVIEW ─── -->
+<section class="skills-preview-section">
+  <div class="container">
+    <div class="section-label">52 Built-in Skills</div>
+    <h2>Expert in every stack</h2>
+    <p style="color:var(--text-dim);max-width:500px;margin:12px auto 0;">Switch skills with <code style="color:var(--green);font-family:'JetBrains Mono',monospace">--skill</code> or <code style="color:var(--green);font-family:'JetBrains Mono',monospace">/skill</code>. Instant deep expertise for any tech stack.</p>
+    <div class="skills-scroll-row">
+      <div class="skill-chip-card" style="--accent: #42b883"><span class="skill-icon">💚</span> Vue.js</div>
+      <div class="skill-chip-card" style="--accent: #21759b"><span class="skill-icon">🌐</span> WordPress</div>
+      <div class="skill-chip-card" style="--accent: #f7df1e"><span class="skill-icon">🟨</span> JavaScript</div>
+      <div class="skill-chip-card" style="--accent: #61dafb"><span class="skill-icon">⚛</span> React</div>
+      <div class="skill-chip-card" style="--accent: #3178c6"><span class="skill-icon">📘</span> TypeScript</div>
+      <div class="skill-chip-card" style="--accent: #3572A5"><span class="skill-icon">🐍</span> Python</div>
+      <div class="skill-chip-card" style="--accent: #339933"><span class="skill-icon">🟢</span> Node.js</div>
+      <div class="skill-chip-card" style="--accent: #2496ed"><span class="skill-icon">🐳</span> Docker</div>
+      <div class="skill-chip-card" style="--accent: #627eea"><span class="skill-icon">⟠</span> Solidity</div>
+      <div class="skill-chip-card" style="--accent: #049ef4"><span class="skill-icon">🎮</span> Three.js</div>
+      <div class="skill-chip-card" style="--accent: #844FBA"><span class="skill-icon">🏗</span> Terraform</div>
+      <div class="skill-chip-card" style="--accent: #10b981"><span class="skill-icon">⚙</span> Codex Mode</div>
+    </div>
+    <a href="skills.html" class="btn-outline">View all 52 skills →</a>
+  </div>
+</section>
+
+<!-- ─── IMAGE / VIDEO GEN ─── -->
+<section class="gen-ai-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Image &amp; Video Generation</div>
+      <h2>Create visuals,<br><span class="gradient-text">right in your terminal</span></h2>
+      <p>6 image providers · 4 video providers. One flag, zero setup required for free tiers.</p>
+    </div>
+    <div class="gen-grid">
+      <div class="gen-card">
+        <div class="gen-icon">🖼</div>
+        <h3>Image Generation</h3>
+        <p>Pollinations (free, no key) · HuggingFace FLUX · DALL-E 3 · Stability AI · Ideogram · fal.ai</p>
+        <code>opencli --image "website hero illustration"</code>
+      </div>
+      <div class="gen-card">
+        <div class="gen-icon">🎬</div>
+        <h3>Video Generation</h3>
+        <p>HuggingFace (free) · Replicate · Luma AI · Runway Gen-3</p>
+        <code>opencli --video "developer at a terminal"</code>
+      </div>
+    </div>
+  </div>
+</section>
+
 <div class="glow-line"></div>
 
 <!-- ─── HOW IT WORKS ─── -->
@@ -386,7 +584,7 @@
             <p>One npm command gives you the <code style="color:var(--green);font-family:var(--font-mono)">opencli</code> binary everywhere.</p>
             <div class="code-block">
               <button class="copy-btn">Copy</button>
-              <span class="c-muted">$ </span><span class="c-green">npm install -g open-cli</span>
+              <span class="c-muted">$ </span><span class="c-green">npm install -g github:rythmmcosta/open-cli</span>
             </div>
           </div>
         </div>
@@ -488,7 +686,7 @@
       </a>
     </div>
     <div style="margin-top:32px;">
-      <div class="cmd-pill">npm install -g open-cli</div>
+      <div class="cmd-pill">npm install -g github:rythmmcosta/open-cli</div>
     </div>
   </div>
 </section>

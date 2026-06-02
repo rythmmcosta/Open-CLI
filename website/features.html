@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Features — Open CLI</title>
-  <meta name="description" content="Open CLI features: Playwright browser automation, 8 built-in MCP servers, 3-tier safety sandbox, background agents, Telegram notifications, and more.">
-  <meta name="keywords" content="AI CLI features, browser automation, Playwright, MCP servers, AI agents, developer tools, multi-model AI, safety sandbox, GitHub integration, background agents">
+  <meta name="description" content="Open CLI features: 30 MCP servers, 6 image generation providers, 4 video generation providers, and full CLI reference. One CLI. Every AI. Zero Limits.">
+  <meta name="keywords" content="AI CLI features, MCP servers, image generation, video generation, browser automation, Playwright, AI agents, developer tools, multi-model AI, safety sandbox, GitHub integration">
   <meta name="author" content="Rythmm Costa">
   <meta name="copyright" content="Open CLI — opencli.myowncloud.tech">
   <meta name="robots" content="index, follow">
@@ -13,12 +13,12 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Open CLI">
   <meta property="og:title" content="Features — Open CLI">
-  <meta property="og:description" content="Browser automation, 18 MCP servers, 16 AI providers, GitHub integration, SQLite project memory, safety sandbox, background agents — all built in.">
+  <meta property="og:description" content="30 MCP servers, 6 image providers, 4 video providers. All configurable via opencli auth.">
   <meta property="og:image" content="https://opencli.myowncloud.tech/assets/og-image.png">
   <meta property="og:url" content="https://opencli.myowncloud.tech/features.html">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Open CLI Features">
-  <meta name="twitter:description" content="All features built into Open CLI — no extra downloads required.">
+  <meta name="twitter:description" content="30 MCP servers, 6 image providers, 4 video providers — all built into one CLI.">
   <meta name="twitter:image" content="https://opencli.myowncloud.tech/assets/og-image.png">
   <meta name="theme-color" content="#070b14" id="theme-color-meta">
   <script type="application/ld+json">
@@ -32,62 +32,39 @@
   <link rel="stylesheet" href="css/style.css">
   <script>(function(){var t=localStorage.getItem('opencli-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
   <style>
-    .feature-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: center;
-      padding: 60px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .feature-section:last-child { border-bottom: none; }
-    .feature-section.reversed .feature-visual { order: -1; }
-    @media(max-width:800px) {
-      .feature-section { grid-template-columns: 1fr; gap: 24px; padding: 40px 0; }
-      .feature-section.reversed .feature-visual { order: 0; }
-      .safety-row { grid-template-columns: auto 1fr auto; font-size: 0.8rem; }
-    }
-    @media(max-width:640px) {
-      .feature-section { padding: 32px 0; gap: 20px; }
-      .mcp-grid { grid-template-columns: 1fr 1fr !important; }
-    }
-    .mcp-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
-    }
-    .mcp-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 18px 20px;
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-      transition: all 0.2s;
-    }
-    .mcp-card:hover { border-color: var(--border-mid); transform: translateY(-2px); }
-    .mcp-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
-    .mcp-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
-    .mcp-card p  { font-size: 0.78rem; color: var(--text-dim); }
-    .safety-row {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      gap: 16px;
-      padding: 14px 16px;
-      border-radius: 8px;
-      margin-bottom: 8px;
-    }
-    .safety-low    { background: rgba(0,255,157,0.06);  border: 1px solid rgba(0,255,157,0.15); }
-    .safety-medium { background: rgba(255,217,61,0.06); border: 1px solid rgba(255,217,61,0.15); }
-    .safety-high   { background: rgba(255,77,106,0.06); border: 1px solid rgba(255,77,106,0.15); }
-    .safety-label { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; }
-    .sl-low    { color: var(--green);  }
-    .sl-medium { color: var(--yellow); }
-    .sl-high   { color: var(--red);    }
-    .safety-desc { font-size: 0.82rem; color: var(--text-dim); }
-    .safety-action { font-family: var(--font-mono); font-size: 0.75rem; white-space: nowrap; }
+    .features-hero { padding: 80px 0 48px; text-align: center; }
+    .features-hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+    .tab-nav { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 0 0 48px; border-bottom: 1px solid rgba(255,255,255,0.07); padding-bottom: 16px; }
+    .tab-btn { padding: 10px 22px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #64748b; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+    .tab-btn.active, .tab-btn:hover { background: var(--green); color: #000; border-color: var(--green); font-weight: 600; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .mcp-category-section { margin-bottom: 48px; }
+    .mcp-category-section h3 { font-size: 1rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .mcp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+    .mcp-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 20px; transition: transform 0.2s, border-color 0.2s; }
+    .mcp-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.15); }
+    .mcp-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .mcp-icon { font-size: 1.5rem; }
+    .mcp-name { font-weight: 700; font-size: 0.95rem; }
+    .mcp-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; margin-left: auto; }
+    .mcp-badge.free { background: rgba(0,204,126,0.15); color: var(--green); }
+    .mcp-badge.setup { background: rgba(0,180,216,0.15); color: var(--blue); }
+    .mcp-desc { font-size: 0.82rem; color: #64748b; margin-bottom: 12px; line-height: 1.5; }
+    .mcp-tools { display: flex; flex-wrap: wrap; gap: 5px; }
+    .tool-chip { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); color: #94a3b8; font-family: 'JetBrains Mono', monospace; }
+    /* Image/Video gen table */
+    .gen-table { width: 100%; border-collapse: collapse; margin-bottom: 48px; }
+    .gen-table th { text-align: left; padding: 12px 16px; background: rgba(255,255,255,0.05); font-size: 0.8rem; color: #64748b; text-transform: uppercase; }
+    .gen-table td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.87rem; }
+    .gen-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .badge-free { color: #00cc7e; font-weight: 600; }
+    .badge-paid { color: #f59e0b; }
+    /* CLI reference */
+    .cli-table { width: 100%; border-collapse: collapse; }
+    .cli-table th { text-align: left; padding: 12px 16px; background: rgba(255,255,255,0.05); font-size: 0.8rem; color: #64748b; }
+    .cli-table td { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
+    .cli-table td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--green); font-size: 0.8rem; }
   </style>
 </head>
 <body>
@@ -117,234 +94,244 @@
   </div>
 </nav>
 
-<section style="padding-top:140px;padding-bottom:60px;">
-  <div class="container" style="text-align:center;">
-    <span class="section-label">Everything you need</span>
-    <h1 style="font-size:clamp(2.2rem,4vw,3.5rem);margin-bottom:20px;">
-      Features built for<br><span class="gradient-text">real developer work</span>
-    </h1>
-    <p style="color:var(--text-dim);font-size:1.1rem;max-width:520px;margin:0 auto;">
-      Open CLI packs everything a developer needs into a single, zero-config terminal tool.
-    </p>
-  </div>
+<section class="features-hero">
+  <div class="section-label">Features</div>
+  <h1>Everything you need. Built in.</h1>
+  <p style="color:#64748b;max-width:500px;margin:12px auto 0">30 MCP servers, 6 image providers, 4 video providers. All configurable via opencli auth.</p>
 </section>
 
-<!-- FEATURE SECTIONS -->
-<section style="padding-top:0;">
-  <div class="container">
+<div class="container">
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showTab('mcp')">MCP Servers (30)</button>
+    <button class="tab-btn" onclick="showTab('image')">Image Generation</button>
+    <button class="tab-btn" onclick="showTab('video')">Video Generation</button>
+    <button class="tab-btn" onclick="showTab('cli')">CLI Reference</button>
+  </div>
 
-    <!-- Browser automation -->
-    <div class="feature-section">
-      <div class="feature-copy slide-left">
-        <span class="section-label">Browser "Eyes"</span>
-        <h2 style="font-size:1.9rem;margin-bottom:16px;">Playwright-powered<br><span class="gradient-text">visual verification</span></h2>
-        <p style="color:var(--text-dim);margin-bottom:20px;">
-          Ask Open CLI to verify your UI. It will navigate to the page, check buttons exist and are clickable,
-          verify forms work, scroll the page, and take a full-page screenshot.
-        </p>
-        <ul style="display:flex;flex-direction:column;gap:8px;list-style:none;margin-bottom:24px;">
-          <li style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-dim);">
-            <span style="color:var(--green);">✓</span> Screenshot full pages or elements
-          </li>
-          <li style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-dim);">
-            <span style="color:var(--green);">✓</span> Verify buttons, links, forms are clickable
-          </li>
-          <li style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-dim);">
-            <span style="color:var(--green);">✓</span> Check for console errors and 404s
-          </li>
-          <li style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-dim);">
-            <span style="color:var(--green);">✓</span> Extract data from rendered pages
-          </li>
-          <li style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-dim);">
-            <span style="color:var(--green);">✓</span> Scroll and interact with dynamic content
-          </li>
-        </ul>
-        <div class="badge badge-blue">Requires Playwright — desktop only</div>
-      </div>
-      <div class="feature-visual slide-right">
-        <div class="terminal">
-          <div class="terminal-bar">
-            <div class="terminal-dot dot-red"></div>
-            <div class="terminal-dot dot-yellow"></div>
-            <div class="terminal-dot dot-green"></div>
-            <div class="terminal-title">Browser Automation</div>
-          </div>
-          <div class="terminal-body">
-            <div class="t-line"><span class="t-prompt">❯</span><span class="t-cmd">opencli --browser "verify my login page works"</span></div>
-            <div class="t-output"></div>
-            <div class="t-info">  👁 Launching browser...</div>
-            <div class="t-info">  🌐 Navigating to http://localhost:3000/login</div>
-            <div class="t-output"></div>
-            <div class="t-output">  Checking: email input exists     <span style="color:var(--green)">✓</span></div>
-            <div class="t-output">  Checking: password input exists  <span style="color:var(--green)">✓</span></div>
-            <div class="t-output">  Checking: submit button visible  <span style="color:var(--green)">✓</span></div>
-            <div class="t-output">  Checking: submit button clickable <span style="color:var(--green)">✓</span></div>
-            <div class="t-output">  Checking: no console errors      <span style="color:var(--green)">✓</span></div>
-            <div class="t-output"></div>
-            <div class="t-success">  ✓ Screenshot saved: screenshots/login-2025.png</div>
-            <div class="t-success">  ✓ All 5 checks passed</div>
-            <div class="t-output"></div>
-            <div class="t-line"><span class="t-prompt">❯</span><span class="cursor"></span></div>
-          </div>
+  <!-- TAB: MCP Servers -->
+  <div class="tab-panel active" id="tab-mcp">
+
+    <!-- Core / Built-in (free) -->
+    <div class="mcp-category-section">
+      <h3>Core — Built-in (no setup)</h3>
+      <div class="mcp-grid">
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">📁</span><div class="mcp-name">Filesystem</div><span class="mcp-badge free">built-in</span></div>
+          <p class="mcp-desc">Read, write, search, move, copy files and directories</p>
+          <div class="mcp-tools"><span class="tool-chip">read_file</span><span class="tool-chip">write_file</span><span class="tool-chip">search_files</span><span class="tool-chip">list_directory</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🔧</span><div class="mcp-name">Shell</div><span class="mcp-badge free">built-in</span></div>
+          <p class="mcp-desc">Execute bash/sh commands with full stdout/stderr capture</p>
+          <div class="mcp-tools"><span class="tool-chip">execute_command</span><span class="tool-chip">execute_script</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🌿</span><div class="mcp-name">Git</div><span class="mcp-badge free">built-in</span></div>
+          <p class="mcp-desc">Full git operations: status, diff, commit, branch, push, log</p>
+          <div class="mcp-tools"><span class="tool-chip">git_status</span><span class="tool-chip">git_diff</span><span class="tool-chip">git_commit</span><span class="tool-chip">git_push</span><span class="tool-chip">git_log</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🌐</span><div class="mcp-name">HTTP / Fetch</div><span class="mcp-badge free">built-in</span></div>
+          <p class="mcp-desc">Make HTTP requests, fetch web pages, call REST APIs</p>
+          <div class="mcp-tools"><span class="tool-chip">http_get</span><span class="tool-chip">http_post</span><span class="tool-chip">fetch_page</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🗄️</span><div class="mcp-name">SQLite / Database</div><span class="mcp-badge free">built-in</span></div>
+          <p class="mcp-desc">Run SQL queries on SQLite databases, browse schemas</p>
+          <div class="mcp-tools"><span class="tool-chip">sqlite_query</span><span class="tool-chip">sqlite_schema</span><span class="tool-chip">sqlite_insert</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🐳</span><div class="mcp-name">Docker</div><span class="mcp-badge free">built-in</span></div>
+          <p class="mcp-desc">Manage containers, images, volumes, and compose stacks</p>
+          <div class="mcp-tools"><span class="tool-chip">docker_ps</span><span class="tool-chip">docker_run</span><span class="tool-chip">docker_logs</span><span class="tool-chip">compose_up</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">👁</span><div class="mcp-name">Browser / Playwright</div><span class="mcp-badge free">built-in</span></div>
+          <p class="mcp-desc">Navigate, screenshot, click, fill forms, extract content from web pages</p>
+          <div class="mcp-tools"><span class="tool-chip">browser_navigate</span><span class="tool-chip">browser_screenshot</span><span class="tool-chip">browser_click</span><span class="tool-chip">browser_extract</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🖼</span><div class="mcp-name">Image Generation</div><span class="mcp-badge free">built-in</span></div>
+          <p class="mcp-desc">Generate images via Pollinations (free), HuggingFace, DALL-E, Stability</p>
+          <div class="mcp-tools"><span class="tool-chip">generate_image</span><span class="tool-chip">list_generated_images</span><span class="tool-chip">open_image</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🎬</span><div class="mcp-name">Video Generation</div><span class="mcp-badge free">built-in</span></div>
+          <p class="mcp-desc">Generate videos via HuggingFace (free), Replicate, Luma AI, Runway</p>
+          <div class="mcp-tools"><span class="tool-chip">generate_video</span><span class="tool-chip">video_status</span><span class="tool-chip">list_generated_videos</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🤖</span><div class="mcp-name">CLI Tools</div><span class="mcp-badge free">built-in</span></div>
+          <p class="mcp-desc">GitHub Copilot CLI integration (suggest, explain) if installed</p>
+          <div class="mcp-tools"><span class="tool-chip">copilot_suggest</span><span class="tool-chip">copilot_explain</span></div>
         </div>
       </div>
     </div>
 
-    <!-- MCP Servers -->
-    <div class="feature-section reversed">
-      <div class="feature-copy slide-right">
-        <span class="section-label">Built-in MCP Servers</span>
-        <h2 style="font-size:1.9rem;margin-bottom:16px;">8 tool servers,<br><span class="gradient-text">zero downloads</span></h2>
-        <p style="color:var(--text-dim);margin-bottom:20px;">
-          Every MCP tool comes built-in. No external MCP downloads, no configuration. Just use them.
-        </p>
-        <div class="mcp-grid" style="grid-template-columns:1fr 1fr;">
-          <div class="mcp-card"><div class="mcp-icon">📁</div><div><h4>Filesystem</h4><p>Read, write, search files</p></div></div>
-          <div class="mcp-card"><div class="mcp-icon">🔧</div><div><h4>Shell</h4><p>Execute bash commands</p></div></div>
-          <div class="mcp-card"><div class="mcp-icon">🌿</div><div><h4>Git</h4><p>Full git operations</p></div></div>
-          <div class="mcp-card"><div class="mcp-icon">🌐</div><div><h4>HTTP</h4><p>Fetch APIs and pages</p></div></div>
-          <div class="mcp-card"><div class="mcp-icon">🗄️</div><div><h4>Database</h4><p>SQLite queries + schema</p></div></div>
-          <div class="mcp-card"><div class="mcp-icon">🐳</div><div><h4>Docker</h4><p>Containers and compose</p></div></div>
-          <div class="mcp-card"><div class="mcp-icon">🔍</div><div><h4>Web Search</h4><p>DuckDuckGo + fetch</p></div></div>
-          <div class="mcp-card"><div class="mcp-icon">👁️</div><div><h4>Browser</h4><p>Playwright automation</p></div></div>
+    <!-- Cloud Storage (setup required) -->
+    <div class="mcp-category-section">
+      <h3>Cloud Storage</h3>
+      <div class="mcp-grid">
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">☁</span><div class="mcp-name">Amazon S3</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">AWS S3, Cloudflare R2, MinIO — object storage with SigV4 auth</p>
+          <div class="mcp-tools"><span class="tool-chip">s3_list_buckets</span><span class="tool-chip">s3_upload</span><span class="tool-chip">s3_download</span><span class="tool-chip">s3_delete</span></div>
         </div>
-      </div>
-      <div class="feature-visual slide-left">
-        <div class="terminal">
-          <div class="terminal-bar">
-            <div class="terminal-dot dot-red"></div>
-            <div class="terminal-dot dot-yellow"></div>
-            <div class="terminal-dot dot-green"></div>
-            <div class="terminal-title">MCP Servers</div>
-          </div>
-          <div class="terminal-body">
-            <div class="t-line"><span class="t-prompt">❯</span><span class="t-cmd">opencli mcp</span></div>
-            <div class="t-output"></div>
-            <div class="t-info">  Built-in MCP Servers:</div>
-            <div class="t-output"></div>
-            <div class="t-success">  ✓ filesystem   — read, write, search files</div>
-            <div class="t-success">  ✓ shell        — execute bash commands</div>
-            <div class="t-success">  ✓ git          — full git operations</div>
-            <div class="t-success">  ✓ browser      — Playwright automation</div>
-            <div class="t-success">  ✓ http         — fetch URLs and APIs</div>
-            <div class="t-success">  ✓ database     — SQLite queries</div>
-            <div class="t-success">  ✓ docker       — container management</div>
-            <div class="t-success">  ✓ search       — DuckDuckGo + fetch</div>
-            <div class="t-output"></div>
-            <div class="t-output">  All servers built-in. No downloads needed.</div>
-            <div class="t-output"></div>
-            <div class="t-line"><span class="t-prompt">❯</span><span class="cursor"></span></div>
-          </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">📦</span><div class="mcp-name">Google Drive</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">List, upload, download, share Google Drive files and folders</p>
+          <div class="mcp-tools"><span class="tool-chip">gdrive_list</span><span class="tool-chip">gdrive_upload</span><span class="tool-chip">gdrive_download</span><span class="tool-chip">gdrive_share</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">📂</span><div class="mcp-name">Dropbox</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">Dropbox API v2 — list, upload, download, share files</p>
+          <div class="mcp-tools"><span class="tool-chip">dropbox_list</span><span class="tool-chip">dropbox_upload</span><span class="tool-chip">dropbox_download</span><span class="tool-chip">dropbox_share</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🖥</span><div class="mcp-name">FTP / SFTP</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">Connect to FTP/SFTP servers, list/upload/download/delete files</p>
+          <div class="mcp-tools"><span class="tool-chip">ftp_connect</span><span class="tool-chip">ftp_list</span><span class="tool-chip">ftp_upload</span><span class="tool-chip">ftp_download</span></div>
         </div>
       </div>
     </div>
 
-    <!-- Safety sandbox -->
-    <div class="feature-section">
-      <div class="feature-copy slide-left">
-        <span class="section-label">Safety Sandbox</span>
-        <h2 style="font-size:1.9rem;margin-bottom:16px;">3-tier risk scoring<br><span class="gradient-text">on every command</span></h2>
-        <p style="color:var(--text-dim);margin-bottom:24px;">
-          Every tool call is assessed for risk before execution. Safe reads run automatically.
-          Destructive operations require explicit confirmation.
-        </p>
-        <div>
-          <div class="safety-row safety-low">
-            <span class="safety-label sl-low">✓ LOW</span>
-            <span class="safety-desc">Read-only: ls, cat, grep, git log, npm list</span>
-            <span class="safety-action c-green">auto</span>
-          </div>
-          <div class="safety-row safety-medium">
-            <span class="safety-label sl-medium">⚠ MED</span>
-            <span class="safety-desc">Elevated: sudo, npm install -g, git push --force</span>
-            <span class="safety-action c-yellow">[Y/n]</span>
-          </div>
-          <div class="safety-row safety-high">
-            <span class="safety-label sl-high">✕ HIGH</span>
-            <span class="safety-desc">Destructive: rm -rf, DROP TABLE, dd, mkfs</span>
-            <span class="safety-action c-red">type "yes"</span>
-          </div>
+    <!-- Integrations (setup required) -->
+    <div class="mcp-category-section">
+      <h3>Developer Integrations</h3>
+      <div class="mcp-grid">
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🐙</span><div class="mcp-name">GitHub</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">Issues, PRs, repos, code search, commits, releases, Actions</p>
+          <div class="mcp-tools"><span class="tool-chip">github_list_issues</span><span class="tool-chip">github_create_pr</span><span class="tool-chip">github_search_code</span><span class="tool-chip">github_get_repo</span></div>
         </div>
-        <div style="margin-top:20px;" class="code-block">
-          <span class="c-muted"># Preview without running</span><br>
-          <span class="c-muted">$ </span><span class="c-blue">opencli --dry-run "delete log files"</span><br>
-          <span class="c-dim">  [DRY RUN] find . -name "*.log" -delete</span>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">💬</span><div class="mcp-name">Slack</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">Read and post messages, manage channels, search Slack workspace</p>
+          <div class="mcp-tools"><span class="tool-chip">slack_post_message</span><span class="tool-chip">slack_list_channels</span><span class="tool-chip">slack_search</span></div>
         </div>
-      </div>
-      <div class="feature-visual slide-right">
-        <div style="display:flex;flex-direction:column;gap:20px;">
-          <div class="card">
-            <div class="card-icon icon-yellow">🔍</div>
-            <h3>Diff Preview</h3>
-            <p>Before writing any existing file, a diff preview shows exactly what will change.</p>
-          </div>
-          <div class="card">
-            <div class="card-icon icon-blue">🔐</div>
-            <h3>Sensitive Path Detection</h3>
-            <p>Reading <code style="color:var(--blue);font-family:var(--font-mono)">~/.ssh/*</code>, <code style="color:var(--blue);font-family:var(--font-mono)">.env</code>, or <code style="color:var(--blue);font-family:var(--font-mono)">*.pem</code> automatically upgrades to MEDIUM risk.</p>
-          </div>
-          <div class="card">
-            <div class="card-icon icon-green">⚡</div>
-            <h3>Auto-approve Low Risk</h3>
-            <p>Use <code style="color:var(--green);font-family:var(--font-mono)">-y</code> flag to auto-approve all LOW risk commands in trusted environments.</p>
-          </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">📋</span><div class="mcp-name">Notion</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">List pages, get page content, create pages, append blocks, search</p>
+          <div class="mcp-tools"><span class="tool-chip">notion_list_pages</span><span class="tool-chip">notion_create_page</span><span class="tool-chip">notion_append_block</span><span class="tool-chip">notion_search</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🔲</span><div class="mcp-name">Linear</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">List, create, update issues and manage team projects in Linear</p>
+          <div class="mcp-tools"><span class="tool-chip">linear_list_issues</span><span class="tool-chip">linear_create_issue</span><span class="tool-chip">linear_update_issue</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">💳</span><div class="mcp-name">Stripe</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">List customers, products, charges; create payment links (read+test mode)</p>
+          <div class="mcp-tools"><span class="tool-chip">stripe_list_customers</span><span class="tool-chip">stripe_list_products</span><span class="tool-chip">stripe_create_payment_link</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">⚡</span><div class="mcp-name">Supabase</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">Query, insert, update, delete rows; invoke Edge Functions via REST API</p>
+          <div class="mcp-tools"><span class="tool-chip">supabase_query</span><span class="tool-chip">supabase_insert</span><span class="tool-chip">supabase_update</span><span class="tool-chip">supabase_invoke_function</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🗃</span><div class="mcp-name">PostgreSQL</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">Run queries, inspect schemas, manage tables on PostgreSQL databases</p>
+          <div class="mcp-tools"><span class="tool-chip">pg_query</span><span class="tool-chip">pg_schema</span><span class="tool-chip">pg_insert</span><span class="tool-chip">pg_update</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🍃</span><div class="mcp-name">MongoDB</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">Find, insert, update, delete documents; manage collections</p>
+          <div class="mcp-tools"><span class="tool-chip">mongo_find</span><span class="tool-chip">mongo_insert</span><span class="tool-chip">mongo_update</span><span class="tool-chip">mongo_aggregate</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🔴</span><div class="mcp-name">Redis</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">Get/set keys, manage hashes, lists, sorted sets, pub/sub</p>
+          <div class="mcp-tools"><span class="tool-chip">redis_get</span><span class="tool-chip">redis_set</span><span class="tool-chip">redis_hget</span><span class="tool-chip">redis_publish</span></div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-card-head"><span class="mcp-icon">🌐</span><div class="mcp-name">WordPress</div><span class="mcp-badge setup">setup required</span></div>
+          <p class="mcp-desc">WordPress REST API + WP-CLI: posts, pages, plugins, themes, media</p>
+          <div class="mcp-tools"><span class="tool-chip">wp_get_posts</span><span class="tool-chip">wp_create_post</span><span class="tool-chip">wp_get_plugins</span><span class="tool-chip">wp_cli</span></div>
         </div>
       </div>
     </div>
 
   </div>
-</section>
 
-<!-- FULL FEATURE TABLE -->
-<section>
-  <div class="container">
-    <div class="section-header">
-      <span class="section-label">Complete feature list</span>
-      <h2>Everything that's<br><span class="gradient-text">included</span></h2>
-    </div>
-
-    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
-      <table class="feature-table">
-        <thead>
-          <tr>
-            <th>Feature</th>
-            <th>Status</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>Multi-provider AI — 16 providers (Claude, GPT-4o, Gemini, Groq, DeepSeek, Mistral + more)</td><td><span class="check">✓</span></td><td>API key per provider</td></tr>
-          <tr><td>Ollama local AI</td><td><span class="check">✓</span></td><td>No cloud needed</td></tr>
-          <tr><td>20 built-in skills</td><td><span class="check">✓</span></td><td>See Skills page</td></tr>
-          <tr><td>Interactive REPL</td><td><span class="check">✓</span></td><td>Slash commands + history</td></tr>
-          <tr><td>One-shot mode</td><td><span class="check">✓</span></td><td><code style="font-family:var(--font-mono);font-size:0.8rem;">opencli "..."</code></td></tr>
-          <tr><td>Pipe mode</td><td><span class="check">✓</span></td><td><code style="font-family:var(--font-mono);font-size:0.8rem;">cat file | opencli</code></td></tr>
-          <tr><td>File tools (read/write/search)</td><td><span class="check">✓</span></td><td>Diff preview on write</td></tr>
-          <tr><td>Shell execution</td><td><span class="check">✓</span></td><td>Safety sandbox included</td></tr>
-          <tr><td>Git tools</td><td><span class="check">✓</span></td><td>Full git operations</td></tr>
-          <tr><td>HTTP requests</td><td><span class="check">✓</span></td><td>All methods, headers, JSON</td></tr>
-          <tr><td>SQLite database tools</td><td><span class="check">✓</span></td><td>Queries + schema</td></tr>
-          <tr><td>Docker tools</td><td><span class="check">✓</span></td><td>list, logs, exec, compose</td></tr>
-          <tr><td>Web search + fetch</td><td><span class="check">✓</span></td><td>DuckDuckGo API</td></tr>
-          <tr><td>Browser automation</td><td><span class="check">✓</span></td><td>Playwright, desktop only</td></tr>
-          <tr><td>Screenshots</td><td><span class="check">✓</span></td><td>Full page or element</td></tr>
-          <tr><td>Agent system</td><td><span class="check">✓</span></td><td>10 types, cron/file/manual</td></tr>
-          <tr><td>Background processes</td><td><span class="check">✓</span></td><td>Detached, daemon-like</td></tr>
-          <tr><td>Telegram notifications</td><td><span class="check">✓</span></td><td>Bot API</td></tr>
-          <tr><td>Discord notifications</td><td><span class="check">✓</span></td><td>Webhook + embeds</td></tr>
-          <tr><td>Config profiles</td><td><span class="check">✓</span></td><td>model + skill + system</td></tr>
-          <tr><td>Dry-run mode</td><td><span class="check">✓</span></td><td>Preview without executing</td></tr>
-          <tr><td>Context injection</td><td><span class="check">✓</span></td><td><code style="font-family:var(--font-mono);font-size:0.8rem;">-c file</code> flag</td></tr>
-          <tr><td>Streaming responses</td><td><span class="check">✓</span></td><td>Live token streaming</td></tr>
-          <tr><td>Cost tracking</td><td><span class="check">✓</span></td><td><code style="font-family:var(--font-mono);font-size:0.8rem;">--show-cost</code></td></tr>
-          <tr><td>Termux / Android</td><td><span class="check">✓</span></td><td>No browser on ARM</td></tr>
-          <tr><td>Audit log</td><td><span style="color:var(--yellow);">⏳</span></td><td>Coming soon</td></tr>
-          <tr><td>Project-level .opencli config</td><td><span style="color:var(--yellow);">⏳</span></td><td>Coming soon</td></tr>
-        </tbody>
-      </table>
+  <!-- TAB: Image Generation -->
+  <div class="tab-panel" id="tab-image">
+    <h2 style="margin-bottom:24px;font-size:clamp(1.4rem,3vw,2rem)">Image Generation Providers</h2>
+    <p style="color:#64748b;margin-bottom:32px">Generate images directly from the terminal. Default is Pollinations — completely free, no API key needed.</p>
+    <table class="gen-table">
+      <thead><tr><th>Provider</th><th>Cost</th><th>Model</th><th>Command</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Pollinations AI</strong></td><td><span class="badge-free">✅ Free — no key</span></td><td>FLUX, Turbo, DreamShaper</td><td><code>opencli --image "prompt"</code></td></tr>
+        <tr><td><strong>HuggingFace</strong></td><td><span class="badge-free">✅ Free (HF key)</span></td><td>FLUX.1-schnell, SDXL</td><td><code>opencli --image --provider huggingface "..."</code></td></tr>
+        <tr><td><strong>Ideogram v2</strong></td><td><span class="badge-free">✅ Free tier</span></td><td>Ideogram v2</td><td><code>opencli --image --provider ideogram "..."</code></td></tr>
+        <tr><td><strong>Stability AI</strong></td><td><span class="badge-paid">⚡ Free credits</span></td><td>Stable Diffusion 3</td><td><code>opencli --image --provider stability "..."</code></td></tr>
+        <tr><td><strong>DALL-E 3</strong></td><td><span class="badge-paid">💰 Pay per use</span></td><td>DALL-E 3</td><td><code>opencli --image --provider dalle "..."</code></td></tr>
+        <tr><td><strong>fal.ai (Flux)</strong></td><td><span class="badge-paid">⚡ Free credits</span></td><td>FLUX Pro, Dev, Schnell</td><td><code>opencli --image --provider fal "..."</code></td></tr>
+      </tbody>
+    </table>
+    <div style="background:rgba(0,204,126,0.08);border:1px solid rgba(0,204,126,0.2);border-radius:12px;padding:20px;margin-top:16px">
+      <strong style="color:var(--green)">💡 Default provider</strong><br>
+      <span style="color:#94a3b8;font-size:0.87rem">Images default to Pollinations (no API key needed). Change with <code style="color:var(--green)">--provider</code>. Files saved to <code style="color:var(--green)">./generated/img-*.png</code></span>
     </div>
   </div>
-</section>
+
+  <!-- TAB: Video Generation -->
+  <div class="tab-panel" id="tab-video">
+    <h2 style="margin-bottom:24px;font-size:clamp(1.4rem,3vw,2rem)">Video Generation Providers</h2>
+    <p style="color:#64748b;margin-bottom:32px">Generate videos from text prompts. HuggingFace is free with an API key.</p>
+    <table class="gen-table">
+      <thead><tr><th>Provider</th><th>Cost</th><th>Model</th><th>Command</th></tr></thead>
+      <tbody>
+        <tr><td><strong>HuggingFace</strong></td><td><span class="badge-free">✅ Free (HF key)</span></td><td>text-to-video-ms-1.7b</td><td><code>opencli --video "matrix code rain"</code></td></tr>
+        <tr><td><strong>Replicate</strong></td><td><span class="badge-paid">⚡ Free credits</span></td><td>Stable Video Diffusion</td><td><code>opencli --video --provider replicate "..."</code></td></tr>
+        <tr><td><strong>Luma AI</strong></td><td><span class="badge-free">✅ Free tier (5 gen)</span></td><td>Dream Machine</td><td><code>opencli --video --provider luma "..."</code></td></tr>
+        <tr><td><strong>Runway Gen-3</strong></td><td><span class="badge-paid">💰 Paid (free trial)</span></td><td>Gen-3 Alpha</td><td><code>opencli --video --provider runway "..."</code></td></tr>
+      </tbody>
+    </table>
+    <div style="background:rgba(0,180,216,0.08);border:1px solid rgba(0,180,216,0.2);border-radius:12px;padding:20px;margin-top:16px">
+      <strong style="color:var(--blue)">💡 Async generation</strong><br>
+      <span style="color:#94a3b8;font-size:0.87rem">Video generation is async. opencli submits the job and polls for completion. Files saved to <code style="color:var(--green)">./generated/video-*.mp4</code></span>
+    </div>
+  </div>
+
+  <!-- TAB: CLI Reference -->
+  <div class="tab-panel" id="tab-cli">
+    <h2 style="margin-bottom:24px;font-size:clamp(1.4rem,3vw,2rem)">CLI Reference</h2>
+    <table class="cli-table">
+      <thead><tr><th>Command / Flag</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>opencli [prompt]</td><td>One-shot chat with default model</td></tr>
+        <tr><td>opencli</td><td>Launch interactive REPL</td></tr>
+        <tr><td>opencli auth</td><td>Configure AI providers interactively</td></tr>
+        <tr><td>opencli --skill &lt;id&gt;</td><td>Activate a domain skill (react, python, wordpress...)</td></tr>
+        <tr><td>opencli --model &lt;name&gt;</td><td>Use a specific model (claude-opus-4-8, gpt-4o, etc.)</td></tr>
+        <tr><td>opencli --ensemble</td><td>Query all configured AIs simultaneously, synthesize best answer</td></tr>
+        <tr><td>opencli --ensemble --free</td><td>Ensemble mode using only free-tier providers</td></tr>
+        <tr><td>opencli --image "prompt"</td><td>Generate an image (Pollinations default, free)</td></tr>
+        <tr><td>opencli --video "prompt"</td><td>Generate a video clip</td></tr>
+        <tr><td>opencli --codex "prompt"</td><td>Code-only output mode (no explanations)</td></tr>
+        <tr><td>opencli --browser</td><td>Enable browser automation tools</td></tr>
+        <tr><td>opencli skills</td><td>List all 52 available skills</td></tr>
+        <tr><td>opencli mcp list</td><td>List all 30 MCP servers and their status</td></tr>
+        <tr><td>opencli github</td><td>GitHub integration management</td></tr>
+        <tr><td>opencli project</td><td>Project context management</td></tr>
+        <tr><td>opencli sync push/pull</td><td>Cross-device project sync</td></tr>
+        <tr><td>opencli workspace</td><td>Show active multi-window workspace state</td></tr>
+        <tr><td>opencli wordpress &lt;cmd&gt;</td><td>WordPress theme/plugin scaffolding</td></tr>
+        <tr><td>opencli benchmark</td><td>Compare AI models on a task</td></tr>
+        <tr><td>opencli costs</td><td>Show API usage costs and statistics</td></tr>
+        <tr><td>/skill &lt;id&gt;</td><td>REPL: switch skill mid-conversation</td></tr>
+        <tr><td>/model &lt;name&gt;</td><td>REPL: switch AI model</td></tr>
+        <tr><td>/ensemble [prompt]</td><td>REPL: run ensemble query</td></tr>
+        <tr><td>/image &lt;prompt&gt;</td><td>REPL: generate image</td></tr>
+        <tr><td>/video &lt;prompt&gt;</td><td>REPL: generate video</td></tr>
+        <tr><td>/clear</td><td>REPL: clear conversation history</td></tr>
+        <tr><td>/export [html|md]</td><td>REPL: export conversation</td></tr>
+        <tr><td>/help</td><td>REPL: show all commands</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
 <footer>
   <div class="container">
@@ -374,5 +361,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="js/main.js"></script>
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
 </body>
 </html>

@@ -48,12 +48,42 @@ Open CLI also introduces **Ensemble Mode**, which queries multiple AI providers 
 
 ---
 
+## Installation
+
+### Option A — From GitHub (recommended)
+```bash
+git clone https://github.com/rythmmcosta/open-cli.git
+cd open-cli
+npm install && npm run build && npm link
+```
+
+### Option B — NPM shortcut (Node.js 18+ required)
+```bash
+npm install -g github:rythmmcosta/open-cli
+```
+
+### Windows
+Use WSL2 for the best experience:
+```powershell
+# In PowerShell as Administrator:
+wsl --install
+# After restart, in WSL2 terminal:
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs git
+git clone https://github.com/rythmmcosta/open-cli.git
+cd open-cli && npm install && npm run build && npm link
+```
+
+### Android (Termux)
+```bash
+pkg update && pkg install nodejs git
+git clone https://github.com/rythmmcosta/open-cli.git
+cd open-cli && npm install && npm run build && npm link
+```
+
 ## 🚀 Quick Start
 
 ```bash
-# Install globally
-npm install -g open-cli
-
 # Run interactive setup (adds API keys)
 opencli auth
 

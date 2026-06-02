@@ -84,7 +84,7 @@
   <!-- npm install pill -->
   <rect x="80" y="380" width="330" height="44" rx="8" fill="rgba(0,0,0,0.5)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
   <text x="100" y="408" font-family="'JetBrains Mono', monospace" font-size="16" fill="#4a5568">$ </text>
-  <text x="124" y="408" font-family="'JetBrains Mono', monospace" font-size="16" fill="#00cc7e">npm install -g open-cli</text>
+  <text x="124" y="408" font-family="'JetBrains Mono', monospace" font-size="16" fill="#00cc7e">npm install -g github:rythmmcosta/open-cli</text>
 
   <!-- Bottom bar -->
   <rect x="0" y="598" width="1200" height="2" fill="url(#accent)" opacity="0.5"/>

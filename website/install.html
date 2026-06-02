@@ -166,8 +166,11 @@
             <p>Install the <code style="color:var(--green);font-family:var(--font-mono)">opencli</code> binary:</p>
             <div class="code-block">
               <button class="copy-btn">Copy</button>
-              <span class="c-muted"># Install Open CLI globally</span><br>
-              <span class="c-muted">$ </span><span class="c-green">npm install -g open-cli</span><br><br>
+              <span class="c-muted"># Option A — Clone from GitHub (recommended)</span><br>
+              <span class="c-muted">$ </span><span class="c-green">git clone https://github.com/rythmmcosta/open-cli.git</span><br>
+              <span class="c-muted">$ </span><span class="c-green">cd open-cli &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; sudo npm link</span><br><br>
+              <span class="c-muted"># Option B — npm shortcut</span><br>
+              <span class="c-muted">$ </span><span class="c-green">npm install -g github:rythmmcosta/open-cli</span><br><br>
               <span class="c-muted"># Verify installation</span><br>
               <span class="c-muted">$ </span><span class="c-blue">opencli --version</span>
             </div>
@@ -233,7 +236,8 @@
             <h3>Install Open CLI</h3>
             <div class="code-block">
               <button class="copy-btn">Copy</button>
-              <span class="c-muted">$ </span><span class="c-green">npm install -g open-cli</span><br>
+              <span class="c-muted">$ </span><span class="c-green">git clone https://github.com/rythmmcosta/open-cli.git</span><br>
+              <span class="c-muted">$ </span><span class="c-green">cd open-cli &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; sudo npm link</span><br>
               <span class="c-muted">$ </span><span class="c-blue">opencli auth</span>
             </div>
           </div>
@@ -263,7 +267,8 @@
             <h3>Install Open CLI</h3>
             <div class="code-block">
               <button class="copy-btn">Copy</button>
-              <span class="c-muted">$ </span><span class="c-green">npm install -g open-cli</span><br>
+              <span class="c-muted">$ </span><span class="c-green">git clone https://github.com/rythmmcosta/open-cli.git</span><br>
+              <span class="c-muted">$ </span><span class="c-green">cd open-cli &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; sudo npm link</span><br>
               <span class="c-muted">$ </span><span class="c-blue">opencli auth</span>
             </div>
           </div>
@@ -283,10 +288,11 @@
               <button class="copy-btn">Copy</button>
               <span class="c-muted"># In PowerShell as Administrator:</span><br>
               <span class="c-muted">PS> </span><span class="c-green">wsl --install</span><br>
-              <span class="c-muted"># Restart, then in WSL terminal:</span><br>
+              <span class="c-muted"># After restart, in WSL2 terminal:</span><br>
               <span class="c-muted">$ </span><span class="c-blue">curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -</span><br>
-              <span class="c-muted">$ </span><span class="c-blue">sudo apt install -y nodejs</span><br>
-              <span class="c-muted">$ </span><span class="c-green">npm install -g open-cli</span>
+              <span class="c-muted">$ </span><span class="c-blue">sudo apt install -y nodejs git</span><br>
+              <span class="c-muted">$ </span><span class="c-green">git clone https://github.com/rythmmcosta/open-cli.git</span><br>
+              <span class="c-muted">$ </span><span class="c-green">cd open-cli &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; npm link</span>
             </div>
           </div>
         </div>
@@ -294,10 +300,14 @@
           <div class="step-num">2</div>
           <div class="step-content">
             <h3>Option B — Native Windows</h3>
-            <p>Download Node.js from nodejs.org, then in PowerShell:</p>
+            <p>Download Node.js 18+ from nodejs.org first, then in PowerShell:</p>
             <div class="code-block">
               <button class="copy-btn">Copy</button>
-              <span class="c-muted">PS> </span><span class="c-green">npm install -g open-cli</span><br>
+              <span class="c-muted">PS> </span><span class="c-green">git clone https://github.com/rythmmcosta/open-cli.git</span><br>
+              <span class="c-muted">PS> </span><span class="c-green">cd open-cli</span><br>
+              <span class="c-muted">PS> </span><span class="c-green">npm install</span><br>
+              <span class="c-muted">PS> </span><span class="c-green">npm run build</span><br>
+              <span class="c-muted">PS> </span><span class="c-green">npm link</span><br>
               <span class="c-muted">PS> </span><span class="c-blue">opencli auth</span>
             </div>
           </div>
