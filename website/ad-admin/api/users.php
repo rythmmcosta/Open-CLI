@@ -57,12 +57,13 @@ if ($method === 'GET') {
         $stmt->execute();
     }
 
+    $totalCount = (int) $total->fetchColumn();
     adminJsonResponse([
         'users'       => $stmt->fetchAll(PDO::FETCH_ASSOC),
-        'total'       => (int) $total->fetchColumn(),
+        'total'       => $totalCount,
         'page'        => $page,
         'per_page'    => $perPage,
-        'total_pages' => (int) ceil($total->fetchColumn(0) / $perPage),
+        'total_pages' => (int) ceil($totalCount / $perPage),
     ]);
 }
 

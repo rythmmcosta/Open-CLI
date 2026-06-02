@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Open CLI</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div id="app">
+
+  <!-- ========================================================
+       LOGIN SCREEN
+       ======================================================== -->
+  <div v-if="!isAuthenticated" class="admin-login">
+    <div class="admin-login-box">
+      <div class="admin-login-logo">⚡ Open CLI</div>
+      <div class="admin-login-sub">Admin Panel — Restricted Access</div>
+
+      <div v-if="authError" class="admin-alert admin-alert-error" style="margin-bottom:16px;">
+        🔒 {{ authError }}
+      </div>
+
+      <form @submit.prevent="doLogin">
+        <div class="form-group" style="margin-bottom:20px;">
+          <label>Admin Password</label>
+          <input
+            v-model="adminPassword"
+            type="password"
+            class="admin-input"
+            placeholder="Enter admin password"
+            autocomplete="current-password"
+            autofocus
+          >
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;" :disabled="authLoading">
+          <span v-if="authLoading" class="spinner" style="width:14px;height:14px;border-width:2px;"></span>
+          <span v-else">🔑</span>
+          {{ authLoading ? 'Authenticating…' : 'Sign In' }}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       AUTHENTICATED ADMIN PANEL
+       ======================================================== -->
+  <div v-else class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">⚡ Open CLI Admin</div>
+
+      <nav class="admin-nav">
+        <a
+          v-for="item in navItems"
+          :key="item.id"
+          @click="view = item.id"
+          :class="{ active: view === item.id }"
+        >
+          <span class="admin-nav-icon">{{ item.icon }}</span>
+          {{ item.label }}
+        </a>
+      </nav>
+
+      <button @click="doLogout" class="admin-logout">
+        🚪 Logout
+      </button>
+    </aside>
+
+    <!-- Main content -->
+    <main class="admin-main">
+
+      <!-- ======================================================
+           DASHBOARD / STATS
+           ====================================================== -->
+      <div v-if="view === 'stats'">
+        <h1 class="admin-page-title"><span>📊</span> Dashboard</h1>
+
+        <div v-if="statsLoading" class="loading-row">
+          <div class="spinner"></div> Loading statistics…
+        </div>
+
+        <div v-else-if="statsError" class="admin-alert admin-alert-error">
+          {{ statsError }}
+        </div>
+
+        <template v-else-if="stats">
+          <!-- Key metrics -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value">{{ stats.users?.total_users ?? 0 }}</div>
+              <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">{{ stats.users?.verified_users ?? 0 }}</div>
+              <div class="stat-label">Verified Users</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">{{ formatBytes(stats.users?.total_storage_bytes) }}</div>
+              <div class="stat-label">Storage Used</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">{{ stats.total_sessions ?? 0 }}</div>
+              <div class="stat-label">Chat Sessions</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">{{ stats.total_messages ?? 0 }}</div>
+              <div class="stat-label">Chat Messages</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">{{ stats.total_packages ?? 0 }}</div>
+              <div class="stat-label">Synced Projects</div>
+            </div>
+          </div>
+
+          <div class="admin-two-col">
+            <!-- New users by day -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div class="admin-card-title">📈 New Users — Last 30 Days</div>
+              </div>
+              <div v-if="stats.users_per_day && stats.users_per_day.length">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>New Users</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="row in [...stats.users_per_day].reverse().slice(0,10)" :key="row.day">
+                      <td>{{ row.day }}</td>
+                      <td>
+                        <span class="badge badge-green">+{{ row.count }}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-else class="admin-empty">No registrations in the last 30 days.</div>
+            </div>
+
+            <!-- Top models -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div class="admin-card-title">🤖 Top AI Models</div>
+              </div>
+              <div v-if="stats.top_models && stats.top_models.length">
+                <table class="admin-table">
+                  <thead>
+                    <tr><th>Model</th><th>Sessions</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="m in stats.top_models" :key="m.model">
+                      <td><span class="mono">{{ m.model }}</span></td>
+                      <td>{{ m.sessions }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-else class="admin-empty">No session data yet.</div>
+            </div>
+          </div>
+
+          <div class="admin-two-col">
+            <!-- Top skills -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div class="admin-card-title">🛠️ Top Skills Used</div>
+              </div>
+              <div v-if="stats.top_skills && stats.top_skills.length">
+                <table class="admin-table">
+                  <thead>
+                    <tr><th>Skill</th><th>Sessions</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="s in stats.top_skills" :key="s.skill">
+                      <td>{{ s.skill }}</td>
+                      <td>{{ s.sessions }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-else class="admin-empty">No skill usage data yet.</div>
+            </div>
+
+            <!-- Recent signups -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div class="admin-card-title">🆕 Recent Signups</div>
+              </div>
+              <div v-if="stats.recent_users && stats.recent_users.length">
+                <table class="admin-table">
+                  <thead>
+                    <tr><th>Email</th><th>Verified</th><th>Joined</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="u in stats.recent_users" :key="u.id">
+                      <td><span class="truncate" style="max-width:160px;">{{ u.email }}</span></td>
+                      <td>
+                        <span :class="u.is_verified ? 'badge badge-green' : 'badge badge-yellow'">
+                          {{ u.is_verified ? 'Yes' : 'No' }}
+                        </span>
+                      </td>
+                      <td style="white-space:nowrap;font-size:0.78rem;color:var(--text-dim);">{{ formatDate(u.created_at) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-else class="admin-empty">No users found.</div>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- ======================================================
+           USERS
+           ====================================================== -->
+      <div v-if="view === 'users'">
+        <h1 class="admin-page-title"><span>👥</span> Users</h1>
+
+        <div class="admin-toolbar">
+          <input
+            v-model="userSearch"
+            @input="onUserSearch"
+            class="admin-input"
+            placeholder="Search by email or name…"
+            type="search"
+          >
+          <button @click="loadUsers" class="btn btn-secondary">🔄 Refresh</button>
+          <span style="color:var(--text-dim);font-size:0.85rem;margin-left:auto;">
+            {{ usersTotal }} user{{ usersTotal !== 1 ? 's' : '' }} total
+          </span>
+        </div>
+
+        <div class="admin-card" style="padding:0;">
+          <div v-if="usersLoading" class="loading-row" style="padding:32px;">
+            <div class="spinner"></div> Loading users…
+          </div>
+          <div v-else-if="!users.length" class="admin-empty">
+            <span class="admin-empty-icon">👤</span>
+            No users found.
+          </div>
+          <div v-else class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Email</th>
+                  <th>Name</th>
+                  <th>Provider</th>
+                  <th>Verified</th>
+                  <th>Storage</th>
+                  <th>Joined</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="user in users" :key="user.id">
+                  <td style="color:var(--text-dim);">{{ user.id }}</td>
+                  <td>
+                    <a @click="loadUserDetail(user.id); selectedUser = selectedUser?.id === user.id ? null : null"
+                       style="color:var(--blue);cursor:pointer;text-decoration:none;">
+                      {{ user.email }}
+                    </a>
+                  </td>
+                  <td>{{ user.name || '—' }}</td>
+                  <td>
+                    <span v-if="user.oauth_provider" class="badge badge-purple">{{ user.oauth_provider }}</span>
+                    <span v-else class="badge badge-gray">local</span>
+                  </td>
+                  <td>
+                    <span
+                      :class="user.is_verified ? 'badge badge-green' : 'badge badge-yellow'"
+                      @click="toggleVerified(user)"
+                      style="cursor:pointer;"
+                      :title="user.is_verified ? 'Click to unverify' : 'Click to verify'"
+                    >
+                      {{ user.is_verified ? '✓ Yes' : '✗ No' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div>{{ formatBytes(user.storage_used_bytes) }} / {{ formatBytes(user.quota_bytes) }}</div>
+                    <div class="quota-bar" style="width:80px;margin-top:4px;">
+                      <div
+                        class="quota-fill"
+                        :class="quotaClass(quotaPct(user.storage_used_bytes, user.quota_bytes))"
+                        :style="{ width: quotaPct(user.storage_used_bytes, user.quota_bytes) + '%' }"
+                      ></div>
+                    </div>
+                  </td>
+                  <td style="white-space:nowrap;font-size:0.78rem;color:var(--text-dim);">{{ formatDate(user.created_at) }}</td>
+                  <td>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                      <button @click="openEditUser(user)" class="btn btn-sm btn-secondary" title="Edit">✏️</button>
+                      <button @click="deleteUser(user.id)" class="btn btn-sm btn-danger" title="Delete">🗑️</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="admin-pagination" v-if="usersTotalPages() > 1">
+          <button
+            @click="userPage--; loadUsers()"
+            :disabled="userPage <= 1"
+            class="btn btn-sm btn-secondary"
+          >← Prev</button>
+          <span>Page {{ userPage }} of {{ usersTotalPages() }}</span>
+          <button
+            @click="userPage++; loadUsers()"
+            :disabled="userPage >= usersTotalPages()"
+            class="btn btn-sm btn-secondary"
+          >Next →</button>
+        </div>
+
+        <!-- Edit User Overlay -->
+        <div v-if="showEditUser" class="admin-overlay" @click.self="showEditUser = false"></div>
+        <div v-if="showEditUser" class="detail-panel">
+          <div class="detail-panel-header">
+            <div class="detail-panel-title">✏️ Edit User #{{ editingUser.id }}</div>
+            <button @click="showEditUser = false" class="btn btn-sm btn-secondary">✕ Close</button>
+          </div>
+
+          <div class="form-group" style="margin-bottom:14px;">
+            <label>Display Name</label>
+            <input v-model="editingUser.name" class="admin-input" placeholder="Name">
+          </div>
+          <div class="form-group" style="margin-bottom:14px;">
+            <label>Email</label>
+            <input v-model="editingUser.email" class="admin-input" type="email">
+          </div>
+          <div class="form-group" style="margin-bottom:14px;">
+            <label>Quota (bytes)</label>
+            <input v-model.number="editingUser.quota_bytes" class="admin-input" type="number" min="0">
+            <span style="font-size:0.78rem;color:var(--text-dim);margin-top:3px;">
+              = {{ formatBytes(editingUser.quota_bytes) }}
+            </span>
+          </div>
+          <div class="form-group" style="margin-bottom:20px;">
+            <label>Verified</label>
+            <select v-model.number="editingUser.is_verified" class="admin-input">
+              <option :value="1">Yes</option>
+              <option :value="0">No</option>
+            </select>
+          </div>
+
+          <div style="display:flex;gap:10px;">
+            <button @click="saveEditUser" class="btn btn-primary">💾 Save Changes</button>
+            <button @click="showEditUser = false" class="btn btn-secondary">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================
+           FILES
+           ====================================================== -->
+      <div v-if="view === 'files'">
+        <h1 class="admin-page-title"><span>📁</span> Synced Projects</h1>
+
+        <div class="admin-toolbar">
+          <input
+            v-model="fileUserFilter"
+            class="admin-input"
+            placeholder="Filter by User ID…"
+            type="number"
+            min="1"
+          >
+          <button @click="loadFiles" class="btn btn-secondary">🔄 Refresh</button>
+          <span style="color:var(--text-dim);font-size:0.85rem;margin-left:auto;">
+            {{ files.length }} package{{ files.length !== 1 ? 's' : '' }}
+          </span>
+        </div>
+
+        <div class="admin-card" style="padding:0;">
+          <div v-if="filesLoading" class="loading-row" style="padding:32px;">
+            <div class="spinner"></div> Loading files…
+          </div>
+          <div v-else-if="!files.length" class="admin-empty">
+            <span class="admin-empty-icon">📂</span>
+            No sync packages found.
+          </div>
+          <div v-else class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>User</th>
+                  <th>Project Name</th>
+                  <th>Device</th>
+                  <th>Size</th>
+                  <th>Synced</th>
+                  <th>On Disk</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="f in files" :key="f.id">
+                  <td style="color:var(--text-dim);">{{ f.id }}</td>
+                  <td>
+                    <div style="font-size:0.78rem;color:var(--text-dim);">UID {{ f.user_id }}</div>
+                    <div style="font-size:0.78rem;">{{ f.email }}</div>
+                  </td>
+                  <td>
+                    <span class="mono" style="font-size:0.8rem;">{{ f.project_name || '(unnamed)' }}</span>
+                  </td>
+                  <td style="color:var(--text-dim);font-size:0.8rem;">{{ f.device_label || '—' }}</td>
+                  <td>{{ formatBytes(f.file_size_bytes) }}</td>
+                  <td style="white-space:nowrap;font-size:0.78rem;color:var(--text-dim);">{{ formatDate(f.synced_at) }}</td>
+                  <td>
+                    <span :class="f.file_exists ? 'badge badge-green' : 'badge badge-red'">
+                      {{ f.file_exists ? '✓ Yes' : '✗ Missing' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                      <button
+                        @click="scanFile(f.id)"
+                        class="btn btn-sm btn-blue"
+                        :disabled="scanningId === f.id"
+                        title="Scan for suspicious content"
+                      >
+                        <span v-if="scanningId === f.id" class="spinner" style="width:10px;height:10px;border-width:2px;"></span>
+                        <span v-else>🔍</span>
+                        Scan
+                      </button>
+                      <button @click="deleteFile(f.id)" class="btn btn-sm btn-danger" title="Delete">🗑️</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Scan result panel -->
+        <div v-if="showScanPanel" class="admin-overlay" @click.self="showScanPanel = false"></div>
+        <div v-if="showScanPanel" class="detail-panel">
+          <div class="detail-panel-header">
+            <div class="detail-panel-title">🔍 Scan Result</div>
+            <button @click="showScanPanel = false; scanResult = null" class="btn btn-sm btn-secondary">✕ Close</button>
+          </div>
+
+          <div v-if="!scanResult || scanResult.loading" class="loading-row">
+            <div class="spinner"></div> Scanning archive…
+          </div>
+          <div v-else-if="scanResult.error" class="admin-alert admin-alert-error">
+            {{ scanResult.error }}
+          </div>
+          <template v-else>
+            <div class="scan-risk" :class="scanResult.risk_level">
+              <span>{{ scanResult.risk_level === 'high' ? '🚨' : scanResult.risk_level === 'medium' ? '⚠️' : '✅' }}</span>
+              Risk Level: {{ (scanResult.risk_level || 'low').toUpperCase() }}
+            </div>
+
+            <div style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;">
+              Scanned {{ scanResult.scanned_files }} file{{ scanResult.scanned_files !== 1 ? 's' : '' }} in
+              <strong style="color:var(--text);">{{ scanResult.project_name || 'project' }}</strong>.
+              Found <strong :style="{ color: scanResult.suspicious_count > 0 ? 'var(--red)' : 'var(--green)' }">
+                {{ scanResult.suspicious_count }} suspicious match{{ scanResult.suspicious_count !== 1 ? 'es' : '' }}
+              </strong>.
+            </div>
+
+            <div v-if="scanResult.suspicious_files && scanResult.suspicious_files.length">
+              <span class="admin-section-label">Suspicious Matches</span>
+              <ul class="scan-file-list">
+                <li v-for="(s, i) in scanResult.suspicious_files" :key="i" class="scan-file-item">
+                  <span>{{ s.file }}</span>
+                  <span class="pattern">Pattern: <code>{{ s.pattern }}</code></span>
+                </li>
+              </ul>
+            </div>
+            <div v-else class="admin-alert admin-alert-success">
+              No suspicious patterns detected.
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- ======================================================
+           CHAT HISTORY
+           ====================================================== -->
+      <div v-if="view === 'chat'">
+        <h1 class="admin-page-title"><span>💬</span> Chat History</h1>
+
+        <div class="admin-toolbar">
+          <input
+            v-model="chatUserFilter"
+            @input="onChatSearch"
+            class="admin-input"
+            placeholder="Filter by User ID…"
+            type="number"
+            min="1"
+          >
+          <button @click="loadChatSessions" class="btn btn-secondary">🔄 Refresh</button>
+          <span style="color:var(--text-dim);font-size:0.85rem;margin-left:auto;">
+            {{ chatSessions.length }} session{{ chatSessions.length !== 1 ? 's' : '' }}
+          </span>
+        </div>
+
+        <div v-if="chatLoading" class="loading-row">
+          <div class="spinner"></div> Loading chat sessions…
+        </div>
+        <div v-else-if="!chatSessions.length" class="admin-empty">
+          <span class="admin-empty-icon">💬</span>
+          No chat sessions found.
+        </div>
+
+        <div v-else>
+          <div
+            v-for="session in chatSessions"
+            :key="session.id"
+            class="admin-card"
+            style="padding:0;margin-bottom:10px;"
+          >
+            <!-- Session header (clickable to expand) -->
+            <div
+              @click="loadMessages(session.id)"
+              style="padding:14px 18px;cursor:pointer;display:flex;align-items:center;gap:12px;flex-wrap:wrap;"
+              :style="{ background: selectedSession === session.id ? 'rgba(0,204,126,0.05)' : '' }"
+            >
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:600;font-size:0.9rem;margin-bottom:2px;">
+                  {{ session.title || 'Untitled session' }}
+                </div>
+                <div style="font-size:0.78rem;color:var(--text-dim);">
+                  {{ session.email }} &nbsp;·&nbsp;
+                  <span class="mono">{{ session.model || 'unknown model' }}</span>
+                  <span v-if="session.skill"> &nbsp;·&nbsp; skill: {{ session.skill }}</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                <span class="badge badge-blue">{{ session.message_count }} msg{{ session.message_count !== 1 ? 's' : '' }}</span>
+                <span style="color:var(--text-dim);font-size:0.78rem;">{{ formatDate(session.created_at) }}</span>
+                <button @click.stop="deleteSession(session.id)" class="btn btn-sm btn-danger" title="Delete session">🗑️</button>
+                <span style="color:var(--text-dim);">{{ selectedSession === session.id ? '▲' : '▼' }}</span>
+              </div>
+            </div>
+
+            <!-- Messages (expanded) -->
+            <div v-if="selectedSession === session.id" style="border-top:1px solid var(--border);padding:16px 18px;">
+              <div v-if="chatMsgLoading" class="loading-row" style="padding:12px 0;">
+                <div class="spinner"></div> Loading messages…
+              </div>
+              <div v-else-if="!chatMessages.length" class="admin-empty" style="padding:24px;">
+                No messages in this session.
+              </div>
+              <div v-else class="chat-messages">
+                <div v-for="msg in chatMessages" :key="msg.id" class="chat-msg">
+                  <div class="chat-msg-role" :class="msg.role">{{ msg.role }}</div>
+                  <div style="flex:1;position:relative;">
+                    <div class="chat-msg-body">{{ msg.content }}</div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+                      <span style="font-size:0.72rem;color:var(--text-muted);">{{ formatDate(msg.created_at) }}</span>
+                      <button @click="deleteMessage(msg.id)" class="btn btn-sm btn-danger" style="padding:2px 7px;font-size:0.72rem;">🗑️</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================
+           ANNOUNCEMENTS
+           ====================================================== -->
+      <div v-if="view === 'announcements'">
+        <h1 class="admin-page-title"><span>📢</span> Announcements</h1>
+
+        <div class="admin-toolbar">
+          <button @click="showNewAnn = !showNewAnn" class="btn btn-primary">
+            {{ showNewAnn ? '✕ Cancel' : '+ New Announcement' }}
+          </button>
+          <button @click="loadAnnouncements" class="btn btn-secondary">🔄 Refresh</button>
+        </div>
+
+        <!-- Create form -->
+        <div v-if="showNewAnn" class="admin-card">
+          <div class="admin-card-title" style="margin-bottom:16px;">📝 Create Announcement</div>
+
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>Title (optional)</label>
+            <input v-model="newAnn.title" class="admin-input" placeholder="Announcement title…">
+          </div>
+
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>Message *</label>
+            <textarea v-model="newAnn.message" class="admin-input" rows="3" placeholder="Announcement text…"></textarea>
+          </div>
+
+          <div class="form-row" style="margin-bottom:16px;">
+            <div class="form-group">
+              <label>Level</label>
+              <select v-model="newAnn.level" class="admin-input">
+                <option value="info">ℹ️ Info</option>
+                <option value="success">✅ Success</option>
+                <option value="warning">⚠️ Warning</option>
+                <option value="error">🚨 Error</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Expires At (optional)</label>
+              <input v-model="newAnn.expires_at" class="admin-input" type="datetime-local">
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;">
+            <button @click="createAnnouncement" :disabled="!newAnn.message" class="btn btn-primary">
+              📢 Publish
+            </button>
+            <button @click="showNewAnn = false" class="btn btn-secondary">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Announcements list -->
+        <div v-if="annLoading" class="loading-row">
+          <div class="spinner"></div> Loading announcements…
+        </div>
+        <div v-else-if="!announcements.length" class="admin-empty">
+          <span class="admin-empty-icon">📢</span>
+          No announcements yet. Create one above.
+        </div>
+        <div v-else class="admin-card" style="padding:0;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Title / Message</th>
+                <th>Level</th>
+                <th>Active</th>
+                <th>Expires</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="ann in announcements" :key="ann.id">
+                <td style="max-width:300px;">
+                  <div v-if="ann.title" style="font-weight:600;margin-bottom:2px;">{{ ann.title }}</div>
+                  <div style="font-size:0.8rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px;">
+                    {{ ann.message }}
+                  </div>
+                </td>
+                <td>
+                  <span class="badge" :class="`level-${ann.level}`">{{ ann.level }}</span>
+                </td>
+                <td>
+                  <span
+                    :class="ann.is_active ? 'badge badge-green' : 'badge badge-gray'"
+                    @click="toggleAnnouncement(ann)"
+                    style="cursor:pointer;"
+                    title="Click to toggle"
+                  >
+                    {{ ann.is_active ? '● Active' : '○ Inactive' }}
+                  </span>
+                </td>
+                <td style="font-size:0.78rem;color:var(--text-dim);">
+                  {{ ann.expires_at ? formatDate(ann.expires_at) : '—' }}
+                </td>
+                <td style="font-size:0.78rem;color:var(--text-dim);white-space:nowrap;">
+                  {{ formatDate(ann.created_at) }}
+                </td>
+                <td>
+                  <button @click="deleteAnnouncement(ann.id)" class="btn btn-sm btn-danger">🗑️</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ======================================================
+           SECURITY
+           ====================================================== -->
+      <div v-if="view === 'security'">
+        <h1 class="admin-page-title"><span>🛡️</span> Security</h1>
+
+        <div class="admin-two-col">
+          <!-- Admin session info -->
+          <div class="admin-card">
+            <div class="admin-card-title" style="margin-bottom:16px;">🔐 Admin Session</div>
+            <div class="detail-row">
+              <span class="detail-label">Session Cookie</span>
+              <span class="detail-value mono">opencli_admin_session</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Duration</span>
+              <span class="detail-value">24 hours</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Attributes</span>
+              <span class="detail-value">HttpOnly · SameSite=Strict · Secure</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Auth Method</span>
+              <span class="detail-value">HMAC-SHA256 (secret + salt), timing-safe compare</span>
+            </div>
+            <div style="margin-top:20px;">
+              <button @click="doLogout" class="btn btn-danger">🚪 Logout Now</button>
+            </div>
+          </div>
+
+          <!-- Scanner -->
+          <div class="admin-card">
+            <div class="admin-card-title" style="margin-bottom:12px;">🔍 Archive Scanner</div>
+            <p style="color:var(--text-dim);font-size:0.875rem;margin-bottom:16px;line-height:1.6;">
+              Scan any user's synced project archive for suspicious PHP patterns
+              (eval/base64, shell execution functions, obfuscated code, etc.).
+            </p>
+            <p style="color:var(--text-dim);font-size:0.85rem;">
+              Use the <strong style="color:var(--text);">Files</strong> tab to run scans on individual archives.
+              Results show matched files and patterns with a risk level rating.
+            </p>
+            <div class="admin-divider"></div>
+            <div class="detail-row">
+              <span class="detail-label">Patterns Checked</span>
+              <span class="detail-value mono" style="font-size:0.78rem;">
+                eval(base64_decode, shell_exec, system, passthru, exec,
+                proc_open, popen, base64_decode, assert, create_function, str_rot13
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security checklist -->
+        <div class="admin-card">
+          <div class="admin-card-title" style="margin-bottom:16px;">✅ Security Checklist</div>
+          <table class="admin-table">
+            <thead>
+              <tr><th>Check</th><th>Status</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Admin password configured</td>
+                <td><span class="badge badge-green">✓ Required at login</span></td>
+                <td style="color:var(--text-dim);font-size:0.82rem;">ADMIN_SECRET env var</td>
+              </tr>
+              <tr>
+                <td>Cookie security attributes</td>
+                <td><span class="badge badge-green">✓ HttpOnly + Strict</span></td>
+                <td style="color:var(--text-dim);font-size:0.82rem;">Prevents XSS theft + CSRF</td>
+              </tr>
+              <tr>
+                <td>Timing-safe comparison</td>
+                <td><span class="badge badge-green">✓ hash_equals()</span></td>
+                <td style="color:var(--text-dim);font-size:0.82rem;">Prevents timing attacks</td>
+              </tr>
+              <tr>
+                <td>Brute-force delay</td>
+                <td><span class="badge badge-green">✓ 500ms on failure</span></td>
+                <td style="color:var(--text-dim);font-size:0.82rem;">Slows password guessing</td>
+              </tr>
+              <tr>
+                <td>Admin panel isolation</td>
+                <td><span class="badge badge-green">✓ Separate cookie path</span></td>
+                <td style="color:var(--text-dim);font-size:0.82rem;">/ad-admin/ path only</td>
+              </tr>
+              <tr>
+                <td>SQL injection protection</td>
+                <td><span class="badge badge-green">✓ PDO prepared statements</span></td>
+                <td style="color:var(--text-dim);font-size:0.82rem;">All queries parameterized</td>
+              </tr>
+              <tr>
+                <td>File path sanitization</td>
+                <td><span class="badge badge-green">✓ escapeshellarg()</span></td>
+                <td style="color:var(--text-dim);font-size:0.82rem;">Used in scan.php exec calls</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
