@@ -59,65 +59,70 @@ CREATE TABLE IF NOT EXISTS devices (
 -- ============================================================
 -- API Keys table
 CREATE TABLE IF NOT EXISTS api_keys (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  name VARCHAR(100) NOT NULL,
-  key_value VARCHAR(100) NOT NULL UNIQUE,
+  id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT UNSIGNED NOT NULL,
+  name       VARCHAR(100) NOT NULL,
+  key_value  VARCHAR(100) NOT NULL UNIQUE,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  last_used DATETIME,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  last_used  DATETIME DEFAULT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_user_keys (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- User sessions table
 CREATE TABLE IF NOT EXISTS user_sessions (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  device_name VARCHAR(255),
-  ip_address VARCHAR(45),
+  id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id     INT UNSIGNED NOT NULL,
+  device_name VARCHAR(255) DEFAULT NULL,
+  ip_address  VARCHAR(45)  DEFAULT NULL,
   last_active DATETIME DEFAULT CURRENT_TIMESTAMP,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_user_sessions (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Activity log table
 CREATE TABLE IF NOT EXISTS activity_log (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  action_type VARCHAR(50) NOT NULL,
-  message VARCHAR(500),
-  device_name VARCHAR(255),
-  ip_address VARCHAR(45),
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id     INT UNSIGNED NOT NULL,
+  action_type VARCHAR(50)  NOT NULL,
+  message     VARCHAR(500) DEFAULT NULL,
+  device_name VARCHAR(255) DEFAULT NULL,
+  ip_address  VARCHAR(45)  DEFAULT NULL,
+  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_activity_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Snippets table
 CREATE TABLE IF NOT EXISTS snippets (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  command TEXT NOT NULL,
-  tags VARCHAR(255),
+  id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT UNSIGNED NOT NULL,
+  name       VARCHAR(255) NOT NULL,
+  command    TEXT         NOT NULL,
+  tags       VARCHAR(255) DEFAULT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_snippets_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Webhooks table
 CREATE TABLE IF NOT EXISTS webhooks (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  url VARCHAR(500) NOT NULL,
-  event VARCHAR(50) NOT NULL DEFAULT 'sync',
+  id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT UNSIGNED NOT NULL,
+  url        VARCHAR(500) NOT NULL,
+  event      VARCHAR(50)  NOT NULL DEFAULT 'sync',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_webhooks_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Feedback table
+-- Feedback table (no FK — allows anonymous feedback)
 CREATE TABLE IF NOT EXISTS feedback (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT,
-  email VARCHAR(255),
-  message TEXT NOT NULL,
+  id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT UNSIGNED DEFAULT NULL,
+  email      VARCHAR(255) DEFAULT NULL,
+  message    TEXT         NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
