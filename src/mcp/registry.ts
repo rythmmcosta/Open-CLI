@@ -56,6 +56,10 @@ import { notionTools } from './notion';
 import { linearTools } from './linear';
 import { stripeTools } from './stripe';
 import { supabaseTools } from './supabase';
+import { wordpressTools } from './wordpress';
+import { imageGenTools } from './image-gen';
+import { videoGenTools } from './video-gen';
+import { cliToolsTools } from './cli-tools';
 
 export const BUILTIN_MCP_SERVERS: MCPServer[] = [
   // ── Core 8 ──────────────────────────────────────────────────────────────
@@ -302,6 +306,42 @@ export const BUILTIN_MCP_SERVERS: MCPServer[] = [
     requiresSetup: true,
     setupInstructions: 'Provide Supabase URL and anon key with each tool call',
     tools: supabaseTools,
+  },
+  {
+    id: 'wordpress',
+    name: 'WordPress',
+    description: 'WordPress REST API + WP-CLI: manage posts, pages, plugins, themes, options, media',
+    version: '1.0.0',
+    category: 'integrations',
+    requiresSetup: true,
+    setupInstructions: 'Provide WordPress site URL and Application Password (base64 user:apppass) with each tool call',
+    tools: wordpressTools,
+  },
+  {
+    id: 'image-gen',
+    name: 'Image Generation',
+    description: 'Generate images via Pollinations (FREE), HuggingFace, DALL-E, Stability AI, Ideogram, fal.ai',
+    version: '1.0.0',
+    category: 'ai',
+    tools: imageGenTools,
+  },
+  {
+    id: 'video-gen',
+    name: 'Video Generation',
+    description: 'Generate videos via HuggingFace (free), Replicate, Luma AI, Runway Gen-3',
+    version: '1.0.0',
+    category: 'ai',
+    requiresSetup: true,
+    setupInstructions: 'Set a HuggingFace key (free) for video generation. Run: opencli auth',
+    tools: videoGenTools,
+  },
+  {
+    id: 'cli-tools',
+    name: 'CLI Tools',
+    description: 'External CLI wrappers: GitHub Copilot suggest/explain (requires gh copilot extension)',
+    version: '1.0.0',
+    category: 'devtools',
+    tools: cliToolsTools,
   },
 ];
 

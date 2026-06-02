@@ -495,6 +495,51 @@ async function handleCommand(input: string, context: ConversationContext, option
       break;
     }
 
+    // ── Image generation ──────────────────────────────────
+    case 'image': {
+      // /image [--provider <name>] <prompt>
+      let providerName: string | undefined;
+      let promptParts = [...args];
+      if (args[0] === '--provider' && args[1]) { providerName = args[1]; promptParts = args.slice(2); }
+      const imagePrompt = promptParts.join(' ');
+      if (!imagePrompt) { showWarning('Usage: /image [--provider pollinations|huggingface|dalle|stability] <prompt>'); break; }
+      const { getImageProvider } = await import('../providers/image-router');
+      const imgProvider = getImageProvider(providerName, getConfig());
+      const ora = (await import('ora')).default;
+      const spinner = ora(`Generating image with ${imgProvider.name}...`).start();
+      try {
+        const result = await imgProvider.generate(imagePrompt);
+        spinner.succeed(C.green(`Image saved: ${result.filePath}`));
+        if (result.url) console.log(C.dim('  URL: ' + result.url));
+      } catch (err) { spinner.fail((err as Error).message); }
+      break;
+    }
+
+    // ── Video generation ──────────────────────────────────
+    case 'video': {
+      const videoPrompt = args.join(' ');
+      if (!videoPrompt) { showWarning('Usage: /video <prompt>'); break; }
+      const { getVideoProvider } = await import('../providers/video-router');
+      const cfg = getConfig();
+      try {
+        const vidProvider = getVideoProvider(undefined, cfg);
+        const ora = (await import('ora')).default;
+        const spinner = ora(`Generating video with ${vidProvider.name} (may take minutes)...`).start();
+        const result = await vidProvider.generate(videoPrompt);
+        if (result.status === 'complete') spinner.succeed(C.green(`Video saved: ${result.filePath}`));
+        else { spinner.warn(C.yellow(`Video processing — Job: ${result.jobId || 'N/A'}`)); }
+      } catch (err) { showWarning((err as Error).message); }
+      break;
+    }
+
+    // ── WordPress ─────────────────────────────────────────
+    case 'wordpress':
+    case 'wp': {
+      const { runWordpressCommand } = await import('../commands/wordpress');
+      await runWordpressCommand(args[0], args.slice(1));
+      break;
+    }
+
     default:
       showWarning(`Unknown command: /${cmd}. Type /help for available commands.`);
   }

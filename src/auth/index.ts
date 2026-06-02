@@ -35,6 +35,13 @@ const PROVIDERS = [
   // ── Cloud / Enterprise ────────────────────────────────────
   { value: 'azure',      name: 'Azure OpenAI',              color: '#0078d4', models: 'gpt-4o, gpt-4-turbo (via deployment)' },
   { value: 'bedrock',    name: 'AWS Bedrock',               color: '#ff9900', models: 'Claude, Llama, Titan (via AWS)' },
+  // ── Image / Video Generation ──────────────────────────────
+  { value: 'stability',  name: 'Stability AI (Image gen)',    color: '#c084fc', models: 'stable-diffusion-xl, sd3.5 — free credits on signup' },
+  { value: 'ideogram',   name: 'Ideogram (Image gen)',        color: '#818cf8', models: 'V_2, V_1 — free tier (limited)' },
+  { value: 'fal',        name: 'fal.ai (Flux image gen)',     color: '#f472b6', models: 'flux/schnell, flux/dev, flux-realism — free credits' },
+  { value: 'runway',     name: 'Runway Gen-3 (Video gen)',    color: '#34d399', models: 'gen3a_turbo — paid, free trial' },
+  { value: 'luma',       name: 'Luma AI Dream Machine (Video)', color: '#60a5fa', models: 'dream-machine — free tier (5 gen)' },
+  { value: 'replicate',  name: 'Replicate (Video/Image gen)', color: '#f59e0b', models: 'zeroscope, SVD, AnimateDiff — free credits' },
   // ── GitHub ────────────────────────────────────────────────
   { value: 'github',     name: 'GitHub (PAT for /github commands)', color: '#ffffff', models: 'n/a (API token)' },
 ];
@@ -83,6 +90,7 @@ async function addProvider(): Promise<void> {
   if (provider === 'azure') { await addAzure(); return; }
   if (provider === 'bedrock') { await addBedrock(); return; }
   if (provider === 'github') { await addGithub(); return; }
+  if (provider === 'replicate') { await addReplicate(); return; }
   await addApiKey(provider as SimpleProviderKey);
 }
 
@@ -193,6 +201,22 @@ async function addGithub(): Promise<void> {
   }]);
   setGithubToken(token.trim());
   showSuccess('GitHub token saved — use /github commands to interact with repos');
+  console.log();
+}
+
+async function addReplicate(): Promise<void> {
+  console.log('\n  ' + C.dim('Get a Replicate API token at: https://replicate.com/account/api-tokens'));
+  console.log('  ' + C.dim('Free credits available on signup'));
+  const { token } = await inquirer.prompt([{
+    type: 'password',
+    name: 'token',
+    message: 'Enter Replicate API token:',
+    mask: '●',
+    validate: (input: string) => (!input.trim() ? 'Token cannot be empty' : true),
+  }]);
+  const { setReplicateToken } = await import('../config');
+  setReplicateToken(token.trim());
+  showSuccess('Replicate API token saved');
   console.log();
 }
 

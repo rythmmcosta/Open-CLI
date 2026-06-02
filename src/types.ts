@@ -86,6 +86,12 @@ export interface ProviderConfig {
   azure?: { apiKey: string; endpoint: string; deploymentName: string; apiVersion?: string };
   bedrock?: { accessKeyId: string; secretAccessKey: string; region: string; sessionToken?: string };
   github?: { token: string };
+  stability?: { apiKey: string };
+  ideogram?: { apiKey: string };
+  fal?: { apiKey: string };
+  runway?: { apiKey: string };
+  luma?: { apiKey: string };
+  replicate?: { apiToken: string };
 }
 
 export interface ProfileConfig {

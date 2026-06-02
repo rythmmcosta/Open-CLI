@@ -25,6 +25,10 @@ import { notionTools, executeNotionTool } from '../mcp/notion';
 import { linearTools, executeLinearTool } from '../mcp/linear';
 import { stripeTools, executeStripeTool } from '../mcp/stripe';
 import { supabaseTools, executeSupabaseTool } from '../mcp/supabase';
+import { wordpressTools, executeWordpressTool } from '../mcp/wordpress';
+import { imageGenTools, executeImageGenTool } from '../mcp/image-gen';
+import { videoGenTools, executeVideoGenTool } from '../mcp/video-gen';
+import { cliToolsTools, executeCliTool } from '../mcp/cli-tools';
 
 export const ALL_TOOLS: ToolDef[] = [
   shellToolDef,
@@ -55,6 +59,10 @@ export const ALL_TOOLS: ToolDef[] = [
   ...linearTools,
   ...stripeTools,
   ...supabaseTools,
+  ...wordpressTools,
+  ...imageGenTools,
+  ...videoGenTools,
+  ...cliToolsTools,
 ];
 
 export const BROWSER_ENABLED_TOOLS: ToolDef[] = [
@@ -180,6 +188,25 @@ export async function executeTool(
   // Supabase tools
   if (name.startsWith('supabase_')) {
     return executeSupabaseTool(name, input);
+  }
+
+  if (name.startsWith('wp_')) {
+    return executeWordpressTool(name, input);
+  }
+
+  if (name === 'generate_image' || name === 'list_generated_images' || name === 'open_image') {
+    // Pass config via lazy require to avoid circular deps
+    const config = require('../config').getConfig();
+    return executeImageGenTool(name, input, config);
+  }
+
+  if (name === 'generate_video' || name === 'list_generated_videos' || name === 'video_status') {
+    const config = require('../config').getConfig();
+    return executeVideoGenTool(name, input, config);
+  }
+
+  if (name.startsWith('copilot_') || name === 'openai_codex') {
+    return executeCliTool(name, input);
   }
 
   switch (name) {

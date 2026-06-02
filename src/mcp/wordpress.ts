@@ -1,5 +1,5 @@
 'use strict';
-import fetch from 'node-fetch';
+import nodeFetch from 'node-fetch';
 import { execSync } from 'child_process';
 import { ToolDef } from '../types';
 
@@ -130,13 +130,13 @@ export const wordpressTools: ToolDef[] = [
 async function wpFetch(
   url: string,
   auth: string,
-  options: RequestInit = {}
+  options: { method?: string; body?: string } = {}
 ): Promise<{ output: string; isError: boolean }> {
   const headers: Record<string, string> = {
     'Authorization': `Basic ${auth}`,
     'Content-Type': 'application/json',
   };
-  const res = await fetch(url, { ...options, headers } as Parameters<typeof fetch>[1]);
+  const res = await nodeFetch(url, { ...options, headers });
   const text = await res.text();
   if (!res.ok) {
     return { output: `HTTP ${res.status}: ${text}`, isError: true };

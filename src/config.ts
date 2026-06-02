@@ -66,7 +66,8 @@ export function getConfigPath(): string {
 export type SimpleProviderKey =
   | 'anthropic' | 'openai' | 'gemini'
   | 'mistral' | 'groq' | 'moonshot' | 'xai' | 'deepseek'
-  | 'together' | 'perplexity' | 'cerebras' | 'huggingface' | 'cohere';
+  | 'together' | 'perplexity' | 'cerebras' | 'huggingface' | 'cohere'
+  | 'stability' | 'ideogram' | 'fal' | 'runway' | 'luma';
 
 export function setApiKey(provider: SimpleProviderKey, apiKey: string): void {
   const store = getStore();
@@ -100,6 +101,13 @@ export function setGithubToken(token: string): void {
   const store = getStore();
   const providers = store.get('providers') || {};
   providers.github = { token };
+  store.set('providers', providers);
+}
+
+export function setReplicateToken(apiToken: string): void {
+  const store = getStore();
+  const providers = store.get('providers') || {};
+  (providers as Record<string, unknown>).replicate = { apiToken };
   store.set('providers', providers);
 }
 

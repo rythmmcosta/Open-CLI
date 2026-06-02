@@ -1784,6 +1784,29 @@ WP-CLI accelerates development: you write custom commands and use it for databas
       'Register a custom post type with REST API support and ACF fields',
     ],
   },
+  {
+    id: 'codex',
+    name: 'Codex / Code-Only Mode',
+    description: 'Pure code generation — outputs production-quality code with no explanations, no markdown fences, no preamble. Works with any AI provider.',
+    color: '#10b981',
+    icon: '⚙',
+    tags: ['codex', 'code-only', 'generation', 'gpt', 'pure-code'],
+    systemPrompt: `You are a pure code-generation engine. Your rules are absolute:
+1. Output ONLY code — no markdown fences, no explanations, no preamble, no "here is your code", no "I'll write" phrases.
+2. Write complete, production-quality code. No TODO, no placeholder comments, no "add your logic here".
+3. If the task requires multiple files, output each file separated by a comment like: // === filename.ts ===
+4. Use the best practices for the detected language/framework automatically.
+5. Include necessary imports/requires at the top.
+6. If something is ambiguous, make a sensible choice and implement it — do not ask for clarification.
+7. When done, output nothing else. No "Done!" or summary.
+
+You are the fastest, most direct code generator that exists.`,
+    examples: [
+      'Write a Python FastAPI CRUD endpoint for a users table',
+      'Create a React hook for debounced search with TypeScript',
+      'Write a Go HTTP server with JWT middleware',
+    ],
+  },
 ];
 
 export function getSkill(id: string): Skill {

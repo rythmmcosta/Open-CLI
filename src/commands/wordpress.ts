@@ -2,7 +2,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import chalk from 'chalk';
-import fetch from 'node-fetch';
+import nodeFetch from 'node-fetch';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -26,7 +26,7 @@ async function runStatus(siteUrl: string): Promise<void> {
   const url = `${siteUrl.replace(/\/$/, '')}/wp-json/`;
   console.log(chalk.dim(`\n  Fetching ${url} ...\n`));
   try {
-    const res = await fetch(url);
+    const res = await nodeFetch(url);
     if (!res.ok) {
       console.log(chalk.red(`  Error: HTTP ${res.status} ${res.statusText}`));
       return;
@@ -34,7 +34,7 @@ async function runStatus(siteUrl: string): Promise<void> {
     const data = (await res.json()) as Record<string, unknown>;
     console.log('  ' + chalk.bold('Site Name:')   + '   ' + chalk.green(String(data.name ?? '(unknown)')));
     console.log('  ' + chalk.bold('Description:') + '   ' + chalk.white(String(data.description ?? '')));
-    console.log('  ' + chalk.bold('WP Version:')  + '   ' + chalk.yellow(String((data as Record<string, unknown>).gmt_offset !== undefined ? '' : '') + String(data.generator ?? '')));
+    console.log('  ' + chalk.bold('WP Version:')  + '   ' + chalk.yellow(String(data.generator ?? '(unknown)')));
     const namespaces = data.namespaces as string[] | undefined;
     if (namespaces) {
       console.log('  ' + chalk.bold('Namespaces:') + '   ' + chalk.dim(namespaces.join(', ')));
@@ -55,7 +55,7 @@ async function runExport(siteUrl: string, auth?: string): Promise<void> {
   console.log(chalk.dim('\n  Exporting posts and pages...\n'));
 
   async function fetchAll(endpoint: string): Promise<unknown[]> {
-    const res = await fetch(`${base}${endpoint}`, { headers });
+    const res = await nodeFetch(`${base}${endpoint}`, { headers });
     if (!res.ok) throw new Error(`HTTP ${res.status} from ${endpoint}`);
     return (await res.json()) as unknown[];
   }

@@ -36,7 +36,13 @@ program
   .option('--notify', 'Send Telegram/Discord notification when done')
   .option('--ensemble', 'Query all configured AI providers simultaneously and synthesize the best answer')
   .option('--ensemble-free', 'Use only free-tier AI providers for ensemble mode')
-  .option('--top <n>', 'Limit ensemble to top N providers (default: all)');
+  .option('--top <n>', 'Limit ensemble to top N providers (default: all)')
+  .option('--image', 'Generate an image from the prompt (uses Pollinations — free, no key required)')
+  .option('--image-provider <name>', 'Image provider: pollinations, huggingface, dalle, stability, ideogram, fal')
+  .option('--video', 'Generate a video from the prompt (requires HuggingFace key or other video provider)')
+  .option('--video-provider <name>', 'Video provider: huggingface, replicate, luma, runway')
+  .option('--codex', 'Pure code-only mode — no explanations, production code output')
+  .option('--size <WxH>', 'Image/video dimensions, e.g. 1024x1024');
 
 // ── auth ──────────────────────────────────────────────────────────────
 program
@@ -395,6 +401,18 @@ program
     process.exit(0);
   });
 
+// ── wordpress ─────────────────────────────────────────────────────────
+program
+  .command('wordpress')
+  .description('WordPress tools: status, export, new-theme <name>, new-plugin <name>')
+  .argument('[subcommand]', 'status <url> | export <url> | new-theme <name> | new-plugin <name>')
+  .argument('[args...]', 'Arguments for the subcommand')
+  .action(async (sub: string | undefined, args: string[]) => {
+    const { runWordpressCommand } = await import('./commands/wordpress');
+    await runWordpressCommand(sub, args);
+    process.exit(0);
+  });
+
 // ── sync ──────────────────────────────────────────────────────────────
 program
   .command('sync')
@@ -454,6 +472,41 @@ program.action(async (prompt: string | undefined, opts: Record<string, unknown>)
       });
       process.exit(0);
     }
+
+    // ── Image generation mode ─────────────────────────────────────────
+    if (opts.image) {
+      const { getImageProvider } = await import('./providers/image-router');
+      const sizeStr = opts.size as string | undefined;
+      const [w, h] = sizeStr ? sizeStr.split('x').map(Number) : [1024, 1024];
+      const provider = getImageProvider(opts.imageProvider as string | undefined, config);
+      console.log(C.dim(`  Generating image with ${provider.name}...`));
+      try {
+        const result = await provider.generate(query, { width: w, height: h });
+        console.log(C.green(`\n  ✓ Image saved: ${result.filePath}`));
+        if (result.url) console.log(C.dim(`  URL: ${result.url}`));
+      } catch (err) { showError((err as Error).message); process.exit(1); }
+      process.exit(0);
+    }
+
+    // ── Video generation mode ─────────────────────────────────────────
+    if (opts.video) {
+      const { getVideoProvider } = await import('./providers/video-router');
+      const provider = getVideoProvider(opts.videoProvider as string | undefined, config);
+      console.log(C.dim(`  Generating video with ${provider.name} (this may take 1-5 minutes)...`));
+      try {
+        const result = await provider.generate(query);
+        if (result.status === 'complete') {
+          console.log(C.green(`\n  ✓ Video saved: ${result.filePath}`));
+        } else {
+          console.log(C.yellow(`\n  ⏳ Video processing. Job ID: ${result.jobId || 'N/A'}`));
+          console.log(C.dim('  Check provider dashboard or try again in a few minutes.'));
+        }
+      } catch (err) { showError((err as Error).message); process.exit(1); }
+      process.exit(0);
+    }
+
+    // ── Codex mode — force code-only skill ───────────────────────────
+    if (opts.codex) setConfigValue('activeSkill', 'codex');
 
     const context = new ConversationContext(config.contextWindow);
 
