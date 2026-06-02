@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import * as fs from 'fs';
-import { getConfig, setConfigValue, applyProfile } from './config';
+import { getConfig, setConfigValue, applyProfile, autoSelectProvider } from './config';
 import { runAgent } from './core/agent';
 import { ConversationContext } from './core/context';
 import { startRepl } from './ui/repl';
@@ -538,6 +538,14 @@ program.action(async (prompt: string | undefined, opts: Record<string, unknown>)
       process.exit(1);
     }
     process.exit(0);
+  }
+
+  const replConfig = getConfig();
+  await autoSelectProvider(replConfig);
+  const isFreeModeActive = replConfig.defaultModel?.startsWith('pollinations-text');
+  if (isFreeModeActive) {
+    console.log(C.dim('  ⚡ Free mode — Pollinations AI (no API key needed)'));
+    console.log(C.dim('  Run ' + C.green('opencli auth') + ' to configure Claude, GPT-4o, Groq, or 14 other providers\n'));
   }
 
   await startRepl({

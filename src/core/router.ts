@@ -22,7 +22,7 @@ export type ProviderName =
   | 'anthropic' | 'openai' | 'gemini' | 'ollama'
   | 'mistral' | 'groq' | 'moonshot' | 'xai' | 'deepseek'
   | 'together' | 'perplexity' | 'cerebras' | 'huggingface'
-  | 'cohere' | 'azure' | 'bedrock' | 'openrouter';
+  | 'cohere' | 'azure' | 'bedrock' | 'openrouter' | 'pollinations-text';
 
 export function getProviderName(model: string): ProviderName {
   if (model.startsWith('claude'))                         return 'anthropic';
@@ -41,7 +41,14 @@ export function getProviderName(model: string): ProviderName {
   if (model.startsWith('command-r'))                      return 'cohere';
   if (model.startsWith('azure:'))                         return 'azure';
   if (model.startsWith('bedrock:') || model.includes('anthropic.claude') || model.includes('amazon.titan')) return 'bedrock';
-  return 'anthropic';
+  if (model.startsWith('pollinations-text:') || model === 'pollinations-text') return 'pollinations-text';
+  // If model looks like provider:model but prefix unknown
+  if (model.includes(':')) {
+    const prefix = model.split(':')[0];
+    throw new Error(`Unknown provider "${prefix}". Try: opencli auth  OR  use /model to pick a model.`);
+  }
+  // No configured provider found — suggest options
+  throw new Error(`No AI configured. Run: opencli auth  OR  install Ollama (free) at ollama.com`);
 }
 
 export function getProvider(model: string, config: AppConfig): Provider {
@@ -130,6 +137,10 @@ export function getProvider(model: string, config: AppConfig): Provider {
         throw new Error('AWS Bedrock credentials not set. Run: opencli auth');
       }
       return new BedrockProvider(bd.accessKeyId, bd.secretAccessKey, bd.region || 'us-east-1', bd.sessionToken);
+    }
+    case 'pollinations-text': {
+      const { PollinationsTextProvider } = require('../providers/pollinations-text');
+      return new PollinationsTextProvider();
     }
     default:
       throw new Error(`Unknown provider for model: ${model}`);

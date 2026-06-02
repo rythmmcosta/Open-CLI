@@ -1,4 +1,5 @@
 import * as readline from 'readline';
+import * as os from 'os';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { getConfig, setConfigValue, applyProfile } from '../config';
@@ -19,6 +20,63 @@ import { runAgentOnce, spawnAgentBackground } from '../agents/runner';
 import { BUILTIN_AGENT_TYPES } from '../agents/types';
 import { BUILTIN_MCP_SERVERS } from '../mcp/registry';
 
+// --- System stats ---
+interface SystemStats { cpuPct: number; ramPct: number; ramUsedGB: string; }
+
+function getSystemStats(): SystemStats {
+  const total = os.totalmem();
+  const free = os.freemem();
+  const ramPct = Math.round(((total - free) / total) * 100);
+  const ramUsedGB = ((total - free) / 1024 / 1024 / 1024).toFixed(1);
+  const loads = os.loadavg();
+  const cpuCount = os.cpus().length;
+  const cpuPct = Math.min(100, Math.round((loads[0] / cpuCount) * 100));
+  return { cpuPct, ramPct, ramUsedGB };
+}
+
+function renderBar(pct: number, width = 8): string {
+  const filled = Math.round((pct / 100) * width);
+  return '█'.repeat(Math.max(0, filled)) + '░'.repeat(Math.max(0, width - filled));
+}
+
+function renderStatusBar(model: string, skill: string): string {
+  const stats = getSystemStats();
+  const cwd = process.cwd().replace(os.homedir(), '~');
+  const cpuBar = renderBar(stats.cpuPct);
+  const ramBar = renderBar(stats.ramPct);
+  return chalk.dim(
+    `  CPU ${cpuBar} ${String(stats.cpuPct).padStart(3)}%` +
+    `  ·  RAM ${ramBar} ${String(stats.ramPct).padStart(3)}% (${stats.ramUsedGB} GB)` +
+    `  ·  ${cwd}` +
+    `  ·  ${model}${skill && skill !== 'general' ? ' · ' + skill : ''}`
+  );
+}
+
+function renderHeader(model: string, skill: string): string {
+  const cwd = process.cwd().replace(os.homedir(), '~');
+  const pkg = (() => { try { return require('../../package.json'); } catch { return { version: '1.0.0' }; } })();
+  const content = ` ⚡ Open CLI v${pkg.version}  ·  ${cwd}  ·  ${chalk.green(model)}  ·  ${skill} `;
+  const width = Math.min(process.stdout.columns || 80, 100);
+  const line = '─'.repeat(width);
+  return chalk.dim(line) + '\n' + chalk.dim('│') + content + chalk.dim('│') + '\n' + chalk.dim(line);
+}
+
+// --- Tab completion ---
+const SLASH_COMMANDS = [
+  '/help', '/auth', '/model', '/skill', '/skills', '/clear', '/reset', '/exit',
+  '/ensemble', '/image', '/video', '/sync', '/github', '/project', '/benchmark',
+  '/costs', '/mcp', '/browser', '/agent', '/wordpress', '/codex', '/search',
+  '/timeline', '/recipe', '/workspace',
+];
+
+function tabCompleter(line: string): [string[], string] {
+  if (line.startsWith('/')) {
+    const hits = SLASH_COMMANDS.filter(c => c.startsWith(line));
+    return [hits.length ? hits : SLASH_COMMANDS, line];
+  }
+  return [[], line];
+}
+
 export interface ReplOptions {
   model?: string;
   skill?: string;
@@ -38,6 +96,8 @@ export async function startRepl(options: ReplOptions = {}): Promise<void> {
   if (options.dryRun !== undefined) setConfigValue('dryRun', options.dryRun);
 
   showBanner();
+  console.log(renderHeader(config.defaultModel || 'no model', config.activeSkill || 'general'));
+  console.log('');
 
   const context = new ConversationContext(config.contextWindow);
 
@@ -47,7 +107,18 @@ export async function startRepl(options: ReplOptions = {}): Promise<void> {
     historySize: 200,
     terminal: true,
     removeHistoryDuplicates: true,
+    completer: tabCompleter,
   });
+
+  let isProcessing = false;
+  const statsInterval: ReturnType<typeof setInterval> = setInterval(() => {
+    if (!isProcessing) {
+      const stats = getSystemStats();
+      process.stdout.write(
+        `\x1b]0;Open CLI · CPU:${stats.cpuPct}% · RAM:${stats.ramPct}% · ${config.defaultModel || 'no model'}\x07`
+      );
+    }
+  }, 3000);
 
   function updatePrompt(): void {
     const cfg = getConfig();
@@ -66,11 +137,17 @@ export async function startRepl(options: ReplOptions = {}): Promise<void> {
         await handleCommand(input, context, options);
       } else {
         const cfg = getConfig();
+        isProcessing = true;
         await runAgent(input, context, cfg, { verbose: options.verbose });
+        isProcessing = false;
         if (options.showCost || cfg.showUsage) {
           const s = context.stats;
           showUsageStats(s, s.totalInputTokens, s.totalOutputTokens);
         }
+        // Print status bar after response
+        console.log('');
+        console.log(renderStatusBar(cfg.defaultModel || 'unknown', cfg.activeSkill || 'general'));
+        console.log('');
       }
     } catch (err: unknown) {
       const message = (err as Error).message;
@@ -86,6 +163,7 @@ export async function startRepl(options: ReplOptions = {}): Promise<void> {
   });
 
   rl.on('close', () => {
+    clearInterval(statsInterval);
     console.log('\n\n  ' + C.green('✓') + ' ' + C.dim('Goodbye! Session ended.') + '\n');
     process.exit(0);
   });
@@ -103,6 +181,21 @@ async function handleCommand(input: string, context: ConversationContext, option
   const parts = input.slice(1).trim().split(/\s+/);
   const cmd = parts[0]?.toLowerCase();
   const args = parts.slice(1);
+
+  // Handle bare `/` — show command list
+  if (input.trim() === '/') {
+    console.log(chalk.dim('\n  Available commands:'));
+    const cols = 4;
+    const chunks: string[][] = [];
+    for (let i = 0; i < SLASH_COMMANDS.length; i += cols) {
+      chunks.push(SLASH_COMMANDS.slice(i, i + cols));
+    }
+    chunks.forEach(row => {
+      console.log('  ' + row.map(c => chalk.green(c.padEnd(16))).join(''));
+    });
+    console.log(chalk.dim('\n  Press Tab after / to autocomplete\n'));
+    return;
+  }
 
   switch (cmd) {
     // ── Core ──────────────────────────────────────────────

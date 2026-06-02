@@ -292,6 +292,9 @@ createApp({
     function oauthFacebook() {
       window.open(`${API}/oauth-facebook.php?redirect=${encodeURIComponent(location.href)}`, '_self');
     }
+    function oauthGithub() {
+      window.open(`${API}/oauth-github.php`, '_self');
+    }
     function doLogout() {
       localStorage.removeItem('opencli_token');
       isLoggedIn.value = false;
@@ -512,7 +515,7 @@ createApp({
       fileSearch, actFilter, theme, accentColor, accentColors, notifPrefs, faq, feedbackMsg, feedbackSent,
       navItems, providerStatus,
       quotaPct, userAvatar, currentViewLabel, filteredProjects, filteredSkills, filteredActivity,
-      doLogin, doRegister, doVerify, resendOtp, oauthGoogle, oauthFacebook, doLogout,
+      doLogin, doRegister, doVerify, resendOtp, oauthGoogle, oauthFacebook, oauthGithub, doLogout,
       navigate, doSearch, formatBytes, formatDate, copyText, copyInstall, copyImageCmd, avatarError, markAllRead,
       generateKey, revokeKey, copyKey, saveProfile, uploadAvatar, changePassword, revokeDevice,
       downloadProject, deleteProject, saveSnippet, deleteSnippet, saveWebhook, deleteWebhook, testWebhook,

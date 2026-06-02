@@ -2,7 +2,7 @@ import Conf from 'conf';
 import { AppConfig, ProfileConfig } from './types';
 
 const DEFAULT_CONFIG: AppConfig = {
-  defaultModel: 'claude-opus-4-5',
+  defaultModel: '',
   activeSkill: 'default',
   autoApprove: false,
   dryRun: false,
@@ -148,4 +148,53 @@ export function getProviderForModel(model: string): 'anthropic' | 'openai' | 'ge
   if (model.startsWith('gemini')) return 'gemini';
   if (model.startsWith('ollama:')) return 'ollama';
   return 'anthropic';
+}
+
+function hasAnyProvider(config: AppConfig): boolean {
+  const p = config.providers || {};
+  return !!(p.anthropic?.apiKey || p.openai?.apiKey || p.groq?.apiKey ||
+            p.gemini?.apiKey || p.ollama || p.openrouter?.apiKey ||
+            p.mistral?.apiKey || p.cohere?.apiKey || p.deepseek?.apiKey);
+}
+
+export async function autoSelectProvider(config: AppConfig): Promise<void> {
+  // If already configured, do nothing
+  if (config.defaultModel && hasAnyProvider(config)) return;
+
+  // Check for owner-injected fallback key (env var, not hardcoded)
+  const fallbackKey = process.env.OPENCLI_FALLBACK_KEY;
+  if (fallbackKey) {
+    if (!config.providers) (config as AppConfig & { providers: Record<string, unknown> }).providers = {};
+    if (!(config.providers as Record<string, unknown>).groq) {
+      (config.providers as Record<string, unknown>).groq = {};
+    }
+    (config.providers as Record<string, { apiKey: string }>).groq = { apiKey: fallbackKey };
+    setConfigValue('defaultModel', 'groq:llama-3.3-70b-versatile');
+    return;
+  }
+
+  // Try Ollama
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 800);
+    const res = await fetch('http://localhost:11434/api/tags', { signal: controller.signal });
+    clearTimeout(timeout);
+    if (res.ok) {
+      const data = await res.json() as { models?: Array<{name: string}> };
+      const models = data.models || [];
+      const preferred = ['llama3.2', 'llama3.1', 'llama3', 'mistral', 'phi3'];
+      let chosen = models[0]?.name;
+      for (const p of preferred) {
+        const found = models.find((m: {name: string}) => m.name.startsWith(p));
+        if (found) { chosen = found.name; break; }
+      }
+      if (chosen) {
+        setConfigValue('defaultModel', `ollama:${chosen}`);
+        return;
+      }
+    }
+  } catch { /* Ollama not running */ }
+
+  // Fall back to Pollinations (free, no key)
+  setConfigValue('defaultModel', 'pollinations-text:openai');
 }

@@ -18,6 +18,8 @@ body { font-family: 'Inter', sans-serif; background: #070b14; color: #e2e8f0; mi
 .oauth-buttons { display: flex; gap: 10px; }
 .btn-oauth { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #e2e8f0; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; font-family: 'Inter', sans-serif; }
 .btn-oauth:hover { background: rgba(255,255,255,0.07); }
+.btn-oauth.github { background: rgba(255,255,255,0.05); color: #e2e8f0; }
+.btn-oauth.github:hover { background: rgba(255,255,255,0.12); }
 .otp-input { text-align: center; font-size: 1.8rem; letter-spacing: 0.4em; font-family: 'JetBrains Mono', monospace; }
 
 /* Layout */
