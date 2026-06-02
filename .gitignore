@@ -5,3 +5,6 @@ dist/
 .env
 .env.*
 *.log
+# API credentials — never commit real values
+website/api/.env
+website/api/credentials.php
