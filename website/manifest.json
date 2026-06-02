@@ -1,0 +1,19 @@
+{
+  "name": "Open CLI Dashboard",
+  "short_name": "Open CLI",
+  "description": "AI terminal dashboard — sync projects, manage providers, generate images",
+  "start_url": "/dashboard/",
+  "display": "standalone",
+  "background_color": "#070b14",
+  "theme_color": "#00cc7e",
+  "orientation": "any",
+  "icons": [
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Dashboard", "url": "/dashboard/", "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Install CLI", "url": "/install.html", "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }] }
+  ],
+  "categories": ["developer", "productivity", "utilities"]
+}
