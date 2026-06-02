@@ -1,0 +1,61 @@
+Options -Indexes
+Options +FollowSymLinks
+
+RewriteEngine On
+RewriteBase /
+
+# ── Force HTTPS ────────────────────────────────────────────────────
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ── Remove trailing slash (not on root or directories) ────────────
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)/$ /$1 [R=301,L]
+
+# ── Redirect old .html URLs → clean URLs (canonical) ──────────────
+RewriteRule ^index\.html$      /           [R=301,L]
+RewriteRule ^home\.html$       /           [R=301,L]
+RewriteRule ^features\.html$   /features   [R=301,L]
+RewriteRule ^skills\.html$     /skills     [R=301,L]
+RewriteRule ^agents\.html$     /agents     [R=301,L]
+RewriteRule ^install\.html$    /install    [R=301,L]
+RewriteRule ^docs\.html$       /docs       [R=301,L]
+RewriteRule ^pricing\.html$    /pricing    [R=301,L]
+RewriteRule ^compare\.html$    /compare    [R=301,L]
+RewriteRule ^changelog\.html$  /changelog  [R=301,L]
+RewriteRule ^providers\.html$  /providers  [R=301,L]
+RewriteRule ^login\.html$      /login      [R=301,L]
+RewriteRule ^account\.html$    /dashboard/ [R=301,L]
+RewriteRule ^reset-password\.html$ /reset-password [R=301,L]
+
+# ── Serve clean URLs from .html files ─────────────────────────────
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/%1.html -f
+RewriteRule ^(features|skills|agents|install|docs|pricing|compare|changelog|providers|login|reset-password|home)/?$ /$1.html [L]
+
+# Route /home → index.html
+RewriteRule ^home/?$ /index.html [L]
+
+# ── API & dashboard — pass through as-is ─────────────────────────
+RewriteRule ^api/          - [L]
+RewriteRule ^dashboard/    - [L]
+RewriteRule ^ad-admin/     - [L]
+
+# ── Security headers ──────────────────────────────────────────────
+<IfModule mod_headers.c>
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# ── Cache static assets ───────────────────────────────────────────
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType text/css "access plus 1 week"
+  ExpiresByType application/javascript "access plus 1 week"
+  ExpiresByType font/woff2 "access plus 1 month"
+</IfModule>
