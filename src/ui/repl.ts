@@ -52,10 +52,10 @@ function renderStatusBar(model: string, skill: string): string {
   );
 }
 
-function renderHeader(model: string, skill: string): string {
+function renderHeader(model: string, skill: string, username?: string): string {
   const cwd = process.cwd().replace(os.homedir(), '~');
   const pkg = (() => { try { return require('../../package.json'); } catch { return { version: '1.0.0' }; } })();
-  const content = ` ⚡ Open CLI v${pkg.version}  ·  ${cwd}  ·  ${chalk.green(model)}  ·  ${skill} `;
+  const content = ` ⚡ Open CLI v${pkg.version}  ·  ${cwd}  ·  ${chalk.green(model)}  ·  ${skill}${username ? '  ·  ' + chalk.cyan('@' + username) : ''} `;
   const width = Math.min(process.stdout.columns || 80, 100);
   const line = '─'.repeat(width);
   return chalk.dim(line) + '\n' + chalk.dim('│') + content + chalk.dim('│') + '\n' + chalk.dim(line);
@@ -95,8 +95,16 @@ export async function startRepl(options: ReplOptions = {}): Promise<void> {
   if (options.autoApprove !== undefined) setConfigValue('autoApprove', options.autoApprove);
   if (options.dryRun !== undefined) setConfigValue('dryRun', options.dryRun);
 
+  let syncUsername: string | undefined;
+  try {
+    const Conf = require('conf');
+    const syncConf = new Conf({ projectName: 'opencli', configName: 'sync' });
+    const syncData = syncConf.get('sync') as { email?: string } | undefined;
+    syncUsername = syncData?.email?.split('@')[0];
+  } catch {}
+
   showBanner();
-  console.log(renderHeader(config.defaultModel || 'no model', config.activeSkill || 'general'));
+  console.log(renderHeader(config.defaultModel || 'no model', config.activeSkill || 'general', syncUsername));
   console.log('');
 
   const context = new ConversationContext(config.contextWindow);

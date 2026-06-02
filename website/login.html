@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Open CLI</title>
+  <meta name="description" content="Sign in or create your Open CLI account.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <script>
+    (function(){var t=localStorage.getItem('opencli-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();
+  </script>
+  <style>
+    /* ─── Login page layout ─── */
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 20px 40px;
+      background: #070b14;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-page::before {
+      content: '';
+      position: fixed;
+      top: -200px; left: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,204,126,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .login-page::after {
+      content: '';
+      position: fixed;
+      bottom: -150px; right: -150px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0,180,216,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ─── Card ─── */
+    .login-card {
+      background: #0d1421;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+
+    /* ─── Logo ─── */
+    .login-logo {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .login-logo a {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .login-logo img {
+      height: 32px;
+    }
+
+    /* ─── Tabs ─── */
+    .login-tabs {
+      display: flex;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 28px;
+      gap: 4px;
+    }
+    .login-tab {
+      flex: 1;
+      padding: 9px 16px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .login-tab.active {
+      background: rgba(0,204,126,0.12);
+      color: var(--green);
+    }
+    .login-tab:hover:not(.active) {
+      color: var(--text);
+    }
+
+    /* ─── Forms ─── */
+    .login-form { display: none; }
+    .login-form.active { display: block; }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 9px;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      box-sizing: border-box;
+    }
+    .form-group input:focus {
+      border-color: rgba(0,204,126,0.5);
+      background: rgba(255,255,255,0.06);
+    }
+    .form-group input::placeholder {
+      color: var(--text-muted);
+    }
+    [data-theme="light"] .form-group input {
+      background: rgba(0,0,0,0.04);
+      border-color: rgba(0,0,0,0.12);
+      color: var(--text);
+    }
+    [data-theme="light"] .form-group input:focus {
+      border-color: var(--green);
+      background: rgba(0,0,0,0.02);
+    }
+
+    /* ─── Submit button ─── */
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background: var(--green);
+      color: #060a12;
+      border: none;
+      border-radius: 9px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: opacity 0.2s, transform 0.2s;
+      margin-top: 4px;
+    }
+    .btn-login:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+    .btn-login:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ─── Divider ─── */
+    .form-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .form-divider::before,
+    .form-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+    .form-divider span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    /* ─── OAuth buttons ─── */
+    .oauth-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-oauth {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 8px;
+      border-radius: 9px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      font-family: var(--font-sans);
+    }
+    .btn-oauth:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.18);
+    }
+    .btn-oauth svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ─── Error messages ─── */
+    .form-error {
+      font-size: 0.8rem;
+      color: #f05d72;
+      margin-top: 10px;
+      min-height: 20px;
+      display: none;
+    }
+    .form-error.visible { display: block; }
+
+    .form-success {
+      font-size: 0.8rem;
+      color: var(--green);
+      margin-top: 10px;
+      min-height: 20px;
+      display: none;
+    }
+    .form-success.visible { display: block; }
+
+    /* ─── Forgot password link ─── */
+    .form-link {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      font-family: var(--font-sans);
+      transition: color 0.2s;
+      text-decoration: none;
+    }
+    .form-link:hover { color: var(--green); }
+
+    .form-row-between {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    /* ─── OTP input ─── */
+    .otp-hint {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      text-align: center;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .otp-hint strong {
+      color: var(--text);
+    }
+    .otp-input {
+      text-align: center;
+      font-family: var(--font-mono) !important;
+      font-size: 1.5rem !important;
+      letter-spacing: 0.4em;
+      padding: 14px !important;
+    }
+    .resend-row {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+    }
+    .resend-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--green);
+      font-size: 0.82rem;
+      font-family: var(--font-sans);
+      padding: 0;
+      transition: opacity 0.2s;
+    }
+    .resend-btn:disabled {
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    /* ─── Forgot password back link ─── */
+    .back-row {
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    /* ─── Light theme overrides ─── */
+    [data-theme="light"] .login-card {
+      background: #ffffff;
+      border-color: rgba(0,0,0,0.09);
+    }
+    [data-theme="light"] .login-tabs {
+      background: rgba(0,0,0,0.04);
+      border-color: rgba(0,0,0,0.09);
+    }
+    [data-theme="light"] .btn-oauth {
+      background: rgba(0,0,0,0.03);
+      border-color: rgba(0,0,0,0.1);
+      color: var(--text);
+    }
+    [data-theme="light"] .btn-oauth:hover {
+      background: rgba(0,0,0,0.07);
+    }
+    [data-theme="light"] .form-divider::before,
+    [data-theme="light"] .form-divider::after {
+      background: rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 480px) {
+      .login-card { padding: 28px 20px; }
+      .oauth-buttons { flex-direction: column; }
+      .btn-oauth { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="/index.html" class="nav-logo">
+      <img src="/assets/logo.svg" alt="Open CLI">
+    </a>
+    <ul class="nav-links">
+      <li><a href="/features.html">Features</a></li>
+      <li><a href="/skills.html">Skills</a></li>
+      <li><a href="/agents.html">Agents</a></li>
+      <li><a href="/install.html">Install</a></li>
+      <li><a href="/docs.html">Docs</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      </button>
+      <a href="/login.html" class="btn btn-outline btn-sm" style="border-color:var(--green);color:var(--green);">Login</a>
+      <a href="/install.html" class="btn btn-primary btn-cta">Get Started</a>
+    </div>
+    <button class="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu">
+    <a href="/features.html">Features</a>
+    <a href="/skills.html">Skills</a>
+    <a href="/agents.html">Agents</a>
+    <a href="/install.html">Install</a>
+    <a href="/docs.html">Docs</a>
+    <a href="/login.html" style="color:var(--green);font-weight:700;">Login</a>
+  </div>
+</nav>
+
+<!-- ─── LOGIN PAGE ─── -->
+<div class="login-page">
+  <div class="login-card">
+
+    <!-- Logo -->
+    <div class="login-logo">
+      <a href="/index.html">
+        <img src="/assets/logo.svg" alt="Open CLI">
+      </a>
+    </div>
+
+    <!-- Tabs -->
+    <div class="login-tabs" role="tablist">
+      <button class="login-tab active" id="tab-signin" role="tab" aria-selected="true" aria-controls="form-signin" onclick="switchTab('signin')">Sign In</button>
+      <button class="login-tab" id="tab-register" role="tab" aria-selected="false" aria-controls="form-register" onclick="switchTab('register')">Create Account</button>
+    </div>
+
+    <!-- ─── Sign In Form ─── -->
+    <div class="login-form active" id="form-signin" role="tabpanel">
+      <div class="form-group">
+        <label for="signin-email">Email</label>
+        <input type="email" id="signin-email" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+      <div class="form-row-between">
+        <label style="font-size:0.82rem;font-weight:600;color:var(--text-dim);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.06em;">Password</label>
+        <button class="form-link" onclick="showForm('forgot')">Forgot password?</button>
+      </div>
+      <div class="form-group" style="margin-top:-6px;">
+        <input type="password" id="signin-password" placeholder="Your password" autocomplete="current-password" required>
+      </div>
+      <button class="btn-login" id="btn-signin" onclick="doLogin()">Sign In</button>
+      <div class="form-error" id="signin-error"></div>
+
+      <div class="form-divider"><span>or continue with</span></div>
+
+      <div class="oauth-buttons">
+        <button class="btn-oauth" onclick="oauthGoogle()" aria-label="Sign in with Google">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </button>
+        <button class="btn-oauth" onclick="oauthFacebook()" aria-label="Sign in with Facebook">
+          <svg viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </button>
+        <button class="btn-oauth" onclick="oauthGithub()" aria-label="Sign in with GitHub">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0112 7.1a9.56 9.56 0 012.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z"/></svg>
+          GitHub
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── Register Form ─── -->
+    <div class="login-form" id="form-register" role="tabpanel">
+      <div class="form-group">
+        <label for="reg-name">Full Name</label>
+        <input type="text" id="reg-name" placeholder="Your name" autocomplete="name" required>
+      </div>
+      <div class="form-group">
+        <label for="reg-email">Email</label>
+        <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+      <div class="form-group">
+        <label for="reg-password">Password <span style="color:var(--text-muted);font-size:0.75em;text-transform:none;letter-spacing:0;">(min 8 chars)</span></label>
+        <input type="password" id="reg-password" placeholder="Min 8 characters" autocomplete="new-password" minlength="8" required>
+      </div>
+      <button class="btn-login" id="btn-register" onclick="doRegister()">Create Account</button>
+      <div class="form-error" id="register-error"></div>
+
+      <div class="form-divider"><span>or continue with</span></div>
+
+      <div class="oauth-buttons">
+        <button class="btn-oauth" onclick="oauthGoogle()" aria-label="Sign up with Google">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </button>
+        <button class="btn-oauth" onclick="oauthFacebook()" aria-label="Sign up with Facebook">
+          <svg viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </button>
+        <button class="btn-oauth" onclick="oauthGithub()" aria-label="Sign up with GitHub">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0112 7.1a9.56 9.56 0 012.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z"/></svg>
+          GitHub
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── OTP Verification Form ─── -->
+    <div class="login-form" id="form-otp" role="tabpanel">
+      <div class="otp-hint">
+        We sent a 6-digit code to<br>
+        <strong id="otp-email-display"></strong>
+      </div>
+      <div class="form-group">
+        <label for="otp-code">Verification Code</label>
+        <input type="text" id="otp-code" class="otp-input" placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code">
+      </div>
+      <button class="btn-login" id="btn-verify" onclick="doVerify()">Verify Email</button>
+      <div class="form-error" id="otp-error"></div>
+      <div class="form-success" id="otp-success"></div>
+      <div class="resend-row">
+        Didn't get the code?
+        <button class="resend-btn" id="resend-btn" onclick="doResend()" disabled>Resend Code (<span id="resend-timer">60</span>s)</button>
+      </div>
+    </div>
+
+    <!-- ─── Forgot Password Form ─── -->
+    <div class="login-form" id="form-forgot" role="tabpanel">
+      <div class="otp-hint">
+        Enter your email and we'll send you a link to reset your password.
+      </div>
+      <div class="form-group">
+        <label for="forgot-email">Email</label>
+        <input type="email" id="forgot-email" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+      <button class="btn-login" id="btn-forgot" onclick="doForgot()">Send Reset Link</button>
+      <div class="form-error" id="forgot-error"></div>
+      <div class="form-success" id="forgot-success"></div>
+      <div class="back-row">
+        <button class="form-link" onclick="showForm('signin')">← Back to Sign In</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+  /* ─── API base ─── */
+  const API = '/api';
+
+  /* ─── Handle OAuth token callback ─── */
+  (function handleOAuthCallback() {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      localStorage.setItem('opencli_token', token);
+      window.location.replace('/dashboard/');
+    }
+  })();
+
+  /* ─── Redirect if already logged in ─── */
+  (function checkAuth() {
+    if (localStorage.getItem('opencli_token')) {
+      window.location.replace('/dashboard/');
+    }
+  })();
+
+  /* ─── State ─── */
+  let _pendingEmail = '';
+  let _resendTimer = null;
+
+  /* ─── Tab switching ─── */
+  function switchTab(tab) {
+    document.querySelectorAll('.login-tab').forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+    });
+    // Only sign-in and register have tabs
+    if (tab === 'signin' || tab === 'register') {
+      const tabEl = document.getElementById('tab-' + tab);
+      if (tabEl) { tabEl.classList.add('active'); tabEl.setAttribute('aria-selected', 'true'); }
+      showForm(tab);
+    }
+  }
+
+  function showForm(name) {
+    document.querySelectorAll('.login-form').forEach(f => f.classList.remove('active'));
+    const form = document.getElementById('form-' + name);
+    if (form) form.classList.add('active');
+    // Update tabs highlight when showing signin/register
+    if (name === 'signin' || name === 'register') {
+      document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+      const tabEl = document.getElementById('tab-' + name);
+      if (tabEl) tabEl.classList.add('active');
+    }
+  }
+
+  /* ─── Error/success helpers ─── */
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('visible');
+  }
+  function clearError(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = '';
+    el.classList.remove('visible');
+  }
+  function showSuccess(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('visible');
+  }
+
+  function setLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.disabled = loading;
+    if (loading) {
+      btn.dataset.origText = btn.textContent;
+      btn.textContent = 'Please wait...';
+    } else {
+      btn.textContent = btn.dataset.origText || btn.textContent;
+    }
+  }
+
+  /* ─── Login ─── */
+  async function doLogin() {
+    clearError('signin-error');
+    const email = document.getElementById('signin-email').value.trim();
+    const password = document.getElementById('signin-password').value;
+    if (!email || !password) { showError('signin-error', 'Email and password are required.'); return; }
+    setLoading('btn-signin', true);
+    try {
+      const res = await fetch(`${API}/login.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem('opencli_token', data.token);
+        window.location.href = '/dashboard/';
+      } else {
+        showError('signin-error', data.error || 'Login failed. Please check your credentials.');
+      }
+    } catch (e) {
+      showError('signin-error', 'Network error. Please try again.');
+    } finally {
+      setLoading('btn-signin', false);
+    }
+  }
+
+  /* ─── Register ─── */
+  async function doRegister() {
+    clearError('register-error');
+    const name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+    if (!name || !email || !password) { showError('register-error', 'All fields are required.'); return; }
+    if (password.length < 8) { showError('register-error', 'Password must be at least 8 characters.'); return; }
+    setLoading('btn-register', true);
+    try {
+      const res = await fetch(`${API}/register.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await res.json();
+      if (data.success || data.message) {
+        _pendingEmail = email;
+        document.getElementById('otp-email-display').textContent = email;
+        startResendTimer();
+        showForm('otp');
+      } else {
+        showError('register-error', data.error || 'Registration failed. Try a different email.');
+      }
+    } catch (e) {
+      showError('register-error', 'Network error. Please try again.');
+    } finally {
+      setLoading('btn-register', false);
+    }
+  }
+
+  /* ─── OTP Verify ─── */
+  async function doVerify() {
+    clearError('otp-error');
+    const otp = document.getElementById('otp-code').value.trim();
+    if (otp.length !== 6 || !/^\d{6}$/.test(otp)) { showError('otp-error', 'Enter the 6-digit code from your email.'); return; }
+    setLoading('btn-verify', true);
+    try {
+      const res = await fetch(`${API}/verify.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: _pendingEmail, otp })
+      });
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem('opencli_token', data.token);
+        window.location.href = '/dashboard/';
+      } else if (data.success) {
+        // Token may come in a subsequent login — redirect to sign-in
+        showSuccess('otp-success', 'Email verified! Signing you in...');
+        setTimeout(() => { showForm('signin'); }, 1500);
+      } else {
+        showError('otp-error', data.error || 'Invalid or expired code.');
+      }
+    } catch (e) {
+      showError('otp-error', 'Network error. Please try again.');
+    } finally {
+      setLoading('btn-verify', false);
+    }
+  }
+
+  /* ─── Resend OTP ─── */
+  function startResendTimer() {
+    const btn = document.getElementById('resend-btn');
+    const timerSpan = document.getElementById('resend-timer');
+    let seconds = 60;
+    btn.disabled = true;
+    timerSpan.textContent = seconds;
+    btn.textContent = `Resend Code (${seconds}s)`;
+    if (_resendTimer) clearInterval(_resendTimer);
+    _resendTimer = setInterval(() => {
+      seconds--;
+      timerSpan.textContent = seconds;
+      btn.textContent = `Resend Code (${seconds}s)`;
+      if (seconds <= 0) {
+        clearInterval(_resendTimer);
+        btn.disabled = false;
+        btn.textContent = 'Resend Code';
+      }
+    }, 1000);
+  }
+
+  async function doResend() {
+    clearError('otp-error');
+    const btn = document.getElementById('resend-btn');
+    btn.disabled = true;
+    try {
+      const res = await fetch(`${API}/register.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: _pendingEmail, resend: true })
+      });
+      const data = await res.json();
+      if (data.success || data.message) {
+        showSuccess('otp-success', 'New code sent!');
+        startResendTimer();
+      } else {
+        showError('otp-error', data.error || 'Could not resend code. Try again.');
+        btn.disabled = false;
+      }
+    } catch (e) {
+      showError('otp-error', 'Network error. Please try again.');
+      btn.disabled = false;
+    }
+  }
+
+  /* ─── Forgot Password ─── */
+  async function doForgot() {
+    clearError('forgot-error');
+    const el = document.getElementById('forgot-success');
+    if (el) { el.classList.remove('visible'); }
+    const email = document.getElementById('forgot-email').value.trim();
+    if (!email) { showError('forgot-error', 'Enter your email address.'); return; }
+    setLoading('btn-forgot', true);
+    try {
+      const res = await fetch(`${API}/forgot-password.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (data.success || data.message) {
+        showSuccess('forgot-success', 'Reset link sent! Check your inbox.');
+        document.getElementById('forgot-email').value = '';
+      } else {
+        showError('forgot-error', data.error || 'Could not send reset link. Check the email address.');
+      }
+    } catch (e) {
+      showError('forgot-error', 'Network error. Please try again.');
+    } finally {
+      setLoading('btn-forgot', false);
+    }
+  }
+
+  /* ─── OAuth redirects ─── */
+  function oauthGoogle()   { window.location.href = `${API}/oauth-google.php`; }
+  function oauthFacebook() { window.location.href = `${API}/oauth-facebook.php`; }
+  function oauthGithub()   { window.location.href = `${API}/oauth-github.php`; }
+
+  /* ─── Enter key support ─── */
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter') return;
+    const active = document.querySelector('.login-form.active');
+    if (!active) return;
+    const id = active.id;
+    if (id === 'form-signin')   doLogin();
+    else if (id === 'form-register') doRegister();
+    else if (id === 'form-otp')      doVerify();
+    else if (id === 'form-forgot')   doForgot();
+  });
+</script>
+</body>
+</html>

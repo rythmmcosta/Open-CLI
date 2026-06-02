@@ -542,6 +542,26 @@ program.action(async (prompt: string | undefined, opts: Record<string, unknown>)
 
   const replConfig = getConfig();
   await autoSelectProvider(replConfig);
+
+  // Check for system announcements if user is logged in
+  try {
+    const syncConf = new (require('conf'))({ projectName: 'opencli-sync' });
+    const token = syncConf.get('token') as string | undefined;
+    if (token) {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 2000);
+      const res = await fetch('https://opencli.myowncloud.tech/api/announcements.php', { signal: ctrl.signal });
+      clearTimeout(t);
+      if (res.ok) {
+        const anns = await res.json() as Array<{title: string; message: string; level: string}>;
+        const critical = anns.filter((a: {level: string}) => a.level === 'critical');
+        for (const ann of critical) {
+          console.log(C.yellow(`\n  ⚠ ${ann.title}: ${ann.message}\n`));
+        }
+      }
+    }
+  } catch { /* silently skip — never block startup */ }
+
   const isFreeModeActive = replConfig.defaultModel?.startsWith('pollinations-text');
   if (isFreeModeActive) {
     console.log(C.dim('  ⚡ Free mode — Pollinations AI (no API key needed)'));
