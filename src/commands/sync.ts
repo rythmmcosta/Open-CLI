@@ -2,8 +2,6 @@ import inquirer from 'inquirer';
 import fetch from 'node-fetch';
 import Conf from 'conf';
 import { C } from '../ui/display';
-// node-fetch v2 Response type
-import type { Response as FetchResponse } from 'node-fetch';
 
 const BASE_URL = 'https://opencli.myowncloud.tech/api';
 

@@ -17,6 +17,14 @@ import { clipboardTools, executeClipboardTool } from '../mcp/clipboard';
 import { pdfTools, executePdfTool } from '../mcp/pdf';
 import { csvTools, executeCsvTool } from '../mcp/csv-tools';
 import { jiraTools, executeJiraTool } from '../mcp/jira';
+import { gdriveTools, executeGdriveTool } from '../mcp/google-drive';
+import { ftpTools, executeFtpTool } from '../mcp/ftp';
+import { s3Tools, executeS3Tool } from '../mcp/s3';
+import { dropboxTools, executeDropboxTool } from '../mcp/dropbox';
+import { notionTools, executeNotionTool } from '../mcp/notion';
+import { linearTools, executeLinearTool } from '../mcp/linear';
+import { stripeTools, executeStripeTool } from '../mcp/stripe';
+import { supabaseTools, executeSupabaseTool } from '../mcp/supabase';
 
 export const ALL_TOOLS: ToolDef[] = [
   shellToolDef,
@@ -39,6 +47,14 @@ export const ALL_TOOLS: ToolDef[] = [
   ...pdfTools,
   ...csvTools,
   ...jiraTools,
+  ...gdriveTools,
+  ...ftpTools,
+  ...s3Tools,
+  ...dropboxTools,
+  ...notionTools,
+  ...linearTools,
+  ...stripeTools,
+  ...supabaseTools,
 ];
 
 export const BROWSER_ENABLED_TOOLS: ToolDef[] = [
@@ -124,6 +140,46 @@ export async function executeTool(
   // Jira tools
   if (name.startsWith('jira_')) {
     return executeJiraTool(name, input);
+  }
+
+  // Google Drive tools
+  if (name.startsWith('gdrive_')) {
+    return executeGdriveTool(name, input);
+  }
+
+  // FTP tools
+  if (name.startsWith('ftp_')) {
+    return executeFtpTool(name, input);
+  }
+
+  // S3 tools
+  if (name.startsWith('s3_')) {
+    return executeS3Tool(name, input);
+  }
+
+  // Dropbox tools
+  if (name.startsWith('dropbox_')) {
+    return executeDropboxTool(name, input);
+  }
+
+  // Notion tools
+  if (name.startsWith('notion_')) {
+    return executeNotionTool(name, input);
+  }
+
+  // Linear tools
+  if (name.startsWith('linear_')) {
+    return executeLinearTool(name, input);
+  }
+
+  // Stripe tools
+  if (name.startsWith('stripe_')) {
+    return executeStripeTool(name, input);
+  }
+
+  // Supabase tools
+  if (name.startsWith('supabase_')) {
+    return executeSupabaseTool(name, input);
   }
 
   switch (name) {

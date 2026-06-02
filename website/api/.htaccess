@@ -1,0 +1,17 @@
+RewriteEngine On
+Header set Access-Control-Allow-Origin "https://opencli.myowncloud.tech"
+Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+Header set Access-Control-Allow-Headers "Authorization, Content-Type"
+
+# Block direct access to config and helper files
+<FilesMatch "^(config|db|jwt)\.php$">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
+
+# Security headers
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-Frame-Options "DENY"
+
+# Disable directory listing
+Options -Indexes

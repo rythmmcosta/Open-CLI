@@ -48,6 +48,14 @@ import { clipboardTools } from './clipboard';
 import { pdfTools } from './pdf';
 import { csvTools } from './csv-tools';
 import { jiraTools } from './jira';
+import { gdriveTools } from './google-drive';
+import { ftpTools } from './ftp';
+import { s3Tools } from './s3';
+import { dropboxTools } from './dropbox';
+import { notionTools } from './notion';
+import { linearTools } from './linear';
+import { stripeTools } from './stripe';
+import { supabaseTools } from './supabase';
 
 export const BUILTIN_MCP_SERVERS: MCPServer[] = [
   // ── Core 8 ──────────────────────────────────────────────────────────────
@@ -212,6 +220,88 @@ export const BUILTIN_MCP_SERVERS: MCPServer[] = [
     requiresSetup: true,
     setupInstructions: 'Provide Jira host (e.g. company.atlassian.net), account email, and API token',
     tools: jiraTools,
+  },
+
+  // ── New 8 (cloud + integrations) ────────────────────────────────────────
+  {
+    id: 'gdrive',
+    name: 'Google Drive',
+    description: 'Google Drive file management: list, upload, download, share, search via Drive API v3',
+    version: '1.0.0',
+    category: 'cloud',
+    requiresSetup: true,
+    setupInstructions: 'Pass Google access_token with each tool call',
+    tools: gdriveTools,
+  },
+  {
+    id: 'ftp',
+    name: 'FTP Client',
+    description: 'FTP file operations: list, upload, download, delete, mkdir',
+    version: '1.0.0',
+    category: 'cloud',
+    requiresSetup: true,
+    setupInstructions: 'Provide FTP host, user, password with each tool call',
+    tools: ftpTools,
+  },
+  {
+    id: 's3',
+    name: 'Amazon S3',
+    description: 'AWS S3 object storage: list buckets/objects, upload, download, delete via SigV4',
+    version: '1.0.0',
+    category: 'cloud',
+    requiresSetup: true,
+    setupInstructions: 'Provide AWS access_key and secret_key with each tool call',
+    tools: s3Tools,
+  },
+  {
+    id: 'dropbox',
+    name: 'Dropbox',
+    description: 'Dropbox file management: list, upload, download, create shared links via API v2',
+    version: '1.0.0',
+    category: 'cloud',
+    requiresSetup: true,
+    setupInstructions: 'Pass Dropbox access_token with each tool call',
+    tools: dropboxTools,
+  },
+  {
+    id: 'notion',
+    name: 'Notion',
+    description: 'Notion workspace integration: list/get/create pages, append blocks, search',
+    version: '1.0.0',
+    category: 'integrations',
+    requiresSetup: true,
+    setupInstructions: 'Pass Notion API key with each tool call',
+    tools: notionTools,
+  },
+  {
+    id: 'linear',
+    name: 'Linear',
+    description: 'Linear project management: list/create/update issues, list teams via GraphQL API',
+    version: '1.0.0',
+    category: 'integrations',
+    requiresSetup: true,
+    setupInstructions: 'Pass Linear API key with each tool call',
+    tools: linearTools,
+  },
+  {
+    id: 'stripe',
+    name: 'Stripe',
+    description: 'Stripe payments: list customers/products/charges, create payment links',
+    version: '1.0.0',
+    category: 'integrations',
+    requiresSetup: true,
+    setupInstructions: 'Pass Stripe API key (test or live) with each tool call',
+    tools: stripeTools,
+  },
+  {
+    id: 'supabase',
+    name: 'Supabase',
+    description: 'Supabase REST API: query, insert, update, delete rows, invoke edge functions',
+    version: '1.0.0',
+    category: 'integrations',
+    requiresSetup: true,
+    setupInstructions: 'Provide Supabase URL and anon key with each tool call',
+    tools: supabaseTools,
   },
 ];
 
