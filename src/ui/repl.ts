@@ -439,6 +439,62 @@ async function handleCommand(input: string, context: ConversationContext, option
       break;
     }
 
+    // ── Ensemble ──────────────────────────────────────────
+    case 'ensemble': {
+      // Usage: /ensemble [--free] <prompt>
+      let onlyFree = false;
+      const ensembleArgs = [...args];
+      if (ensembleArgs[0] === '--free') {
+        onlyFree = true;
+        ensembleArgs.shift();
+      }
+      const ensemblePrompt = ensembleArgs.join(' ');
+      if (!ensemblePrompt) {
+        showWarning('Usage: /ensemble [--free] <prompt>');
+        break;
+      }
+      const { runEnsemble } = await import('../core/ensemble');
+      const cfg = getConfig();
+      await runEnsemble(ensemblePrompt, [], cfg, { onlyFree, verbose: options.verbose });
+      break;
+    }
+
+    // ── Workspace ─────────────────────────────────────────
+    case 'workspace': {
+      const { IPCClient } = await import('../ipc/client');
+      const client = new IPCClient(process.cwd());
+      try {
+        await client.connect();
+        const ctx = await client.getContext();
+        console.log('\n' + C.blue.bold('  ⚡ Active Workspace Windows'));
+        if (ctx.activeWindows.length === 0) {
+          console.log(C.dim('  No other windows connected\n'));
+        } else {
+          for (const w of ctx.activeWindows) {
+            console.log(`  ${C.green(w.windowId)} ${C.dim('pid:' + w.pid)} ${w.currentFile ? C.yellow('→ ' + w.currentFile) : ''}`);
+            if (w.lastAction) console.log(`  ${' '.repeat(2)}${C.dim(w.lastAction)}`);
+          }
+        }
+        if (ctx.recentActions.length) {
+          console.log('\n' + C.dim('  Recent actions:'));
+          ctx.recentActions.forEach(a => console.log('  ' + C.dim('• ' + a)));
+        }
+        console.log();
+        client.disconnect();
+      } catch {
+        console.log(C.dim('\n  No coordinator running (open multiple windows in the same project to enable)\n'));
+      }
+      break;
+    }
+
+    // ── Sync ──────────────────────────────────────────────
+    case 'sync': {
+      const sub = args[0];
+      const { runSync } = await import('../commands/sync');
+      await runSync(sub, args.slice(1));
+      break;
+    }
+
     default:
       showWarning(`Unknown command: /${cmd}. Type /help for available commands.`);
   }

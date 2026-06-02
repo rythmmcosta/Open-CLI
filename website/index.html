@@ -4,19 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Open CLI — AI Terminal for Developers</title>
-  <meta name="description" content="Open CLI is a free, open-source AI terminal with 35+ built-in skills, 18 MCP servers, 16 AI providers (Claude, GPT, Gemini, Groq, DeepSeek, Mistral + more), GitHub integration, SQLite project memory, and browser automation.">
-  <meta name="keywords" content="AI CLI, AI terminal, developer tools, Claude, GPT-4o, Gemini, Ollama, open source, TypeScript, bash automation">
-  <meta name="author" content="Open CLI">
+  <meta name="description" content="Open CLI is a free, open-source AI terminal with 45+ built-in skills, 26 MCP servers, 17 AI providers (Claude, GPT, Gemini, Groq, DeepSeek, Mistral, OpenRouter + more), GitHub integration, SQLite project memory, and browser automation.">
+  <meta name="keywords" content="AI CLI, AI terminal, developer tools, Claude API, GPT-4 terminal, open source AI, AI command line, multi-model AI, Gemini terminal, coding assistant">
+  <meta name="author" content="Rythmm Costa">
+  <meta name="copyright" content="Open CLI — opencli.myowncloud.tech">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://opencli.myowncloud.tech/">
+  <link rel="alternate" hreflang="en" href="https://opencli.myowncloud.tech/">
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Open CLI">
   <meta property="og:title" content="Open CLI — AI Terminal for Developers">
-  <meta property="og:description" content="Free, open-source AI terminal with 20+ skills, browser automation, background agents, and support for Claude, GPT-4o, Gemini, and Ollama.">
+  <meta property="og:description" content="Free, open-source AI terminal with 45+ skills, 26 MCP servers, 17 AI providers, browser automation, background agents, and support for Claude, GPT-4o, Gemini, and more.">
   <meta property="og:image" content="https://opencli.myowncloud.tech/assets/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Open CLI — One CLI. Every AI. Zero Limits. AI terminal for developers">
   <meta property="og:url" content="https://opencli.myowncloud.tech/">
   <meta property="og:locale" content="en_US">
   <!-- Twitter Card -->
@@ -34,12 +37,21 @@
     "name": "Open CLI",
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Linux, macOS, Windows, Android",
-    "description": "Open-source AI-powered terminal tool with 35+ built-in skills, 18 MCP servers, 16 AI providers, GitHub integration, SQLite project memory, AI benchmarking, CLI recipes, code timeline, and cross-project search.",
+    "description": "Open-source AI-powered terminal tool with 45+ built-in skills, 26 MCP servers, 17 AI providers, GitHub integration, SQLite project memory, AI benchmarking, CLI recipes, code timeline, and cross-project search.",
     "url": "https://opencli.myowncloud.tech",
     "downloadUrl": "https://github.com/rythmmcosta/open-cli",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "aggregateRating": { "@type": "AggregateRating", "ratingValue": "5", "ratingCount": "1" }
   }
+  </script>
+  <script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"Is Open CLI free?","acceptedAnswer":{"@type":"Answer","text":"Yes, completely free and open source under the MIT license. It also works with genuinely free AI tiers: Groq, Google Gemini Flash, HuggingFace, Cohere, and OpenRouter free models — no credit card required."}},
+  {"@type":"Question","name":"Which AI providers does Open CLI support?","acceptedAnswer":{"@type":"Answer","text":"17 providers: Claude (Anthropic), GPT-4o (OpenAI), Gemini (Google), Groq, DeepSeek, Mistral, Cohere, Perplexity, xAI Grok, Kimi (Moonshot), Together AI, Cerebras, HuggingFace, Azure OpenAI, AWS Bedrock, OpenRouter, and Ollama (local/offline)."}},
+  {"@type":"Question","name":"What is an MCP server in Open CLI?","acceptedAnswer":{"@type":"Answer","text":"MCP (Model Context Protocol) servers are built-in tool sets that let AI use external services like GitHub, Slack, PostgreSQL, Redis, MongoDB, Google Drive, S3, FTP, Dropbox, Notion, Linear, Stripe, and Supabase — without any separate downloads."}},
+  {"@type":"Question","name":"Can I run Open CLI on Windows, Mac, and Linux?","acceptedAnswer":{"@type":"Answer","text":"Yes. Open CLI runs anywhere Node.js 18+ runs: macOS, Linux, Windows (WSL or PowerShell), and even Termux on Android."}},
+  {"@type":"Question","name":"What is Ensemble Mode?","acceptedAnswer":{"@type":"Answer","text":"Ensemble Mode sends your prompt to all configured AI providers simultaneously, then uses the fastest available model to synthesize the best combined answer. Use opencli --ensemble or /ensemble in the REPL."}}
+]}
   </script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -201,15 +213,15 @@
         </div>
         <div class="hero-stats">
           <div class="stat-item">
-            <span class="stat-num">35+</span>
+            <span class="stat-num">45+</span>
             <span class="stat-label">Built-in Skills</span>
           </div>
           <div class="stat-item">
-            <span class="stat-num">18</span>
+            <span class="stat-num">26</span>
             <span class="stat-label">MCP Servers</span>
           </div>
           <div class="stat-item">
-            <span class="stat-num">16</span>
+            <span class="stat-num">17</span>
             <span class="stat-label">AI Providers</span>
           </div>
           <div class="stat-item">
@@ -220,7 +232,7 @@
 
         <!-- Provider chips -->
         <div class="providers-row">
-          <span style="font-size:0.78rem;color:var(--text-muted);font-family:var(--font-mono);">16 AI providers:</span>
+          <span style="font-size:0.78rem;color:var(--text-muted);font-family:var(--font-mono);">17 AI providers:</span>
           <div class="provider-chip"><span>🟣</span> Claude</div>
           <div class="provider-chip"><span>🟢</span> GPT-4o</div>
           <div class="provider-chip"><span>🔵</span> Gemini</div>
@@ -293,12 +305,12 @@
     <div class="cards-grid">
       <div class="card">
         <div class="feature-icon-wrap icon-green">🧠</div>
-        <h3>16 AI Providers</h3>
-        <p>Claude, GPT-4o, Gemini, Groq, DeepSeek, Mistral, Cohere, Perplexity, xAI Grok, Kimi, Together, Cerebras, HuggingFace, Azure, Bedrock, Ollama.</p>
+        <h3>17 AI Providers</h3>
+        <p>Claude, GPT-4o, Gemini, Groq, DeepSeek, Mistral, Cohere, Perplexity, xAI Grok, Kimi, Together, Cerebras, HuggingFace, Azure, Bedrock, OpenRouter, Ollama.</p>
       </div>
       <div class="card">
         <div class="feature-icon-wrap icon-blue">⚡</div>
-        <h3>35 Built-in Skills</h3>
+        <h3>45 Built-in Skills</h3>
         <p>Expert prompts for Vue, React, Next.js, Go, Java, C#, AWS, Kubernetes, Flutter, ML, GraphQL, Svelte, Prisma, Nginx, Regex and more.</p>
       </div>
       <div class="card">
@@ -318,8 +330,8 @@
       </div>
       <div class="card">
         <div class="feature-icon-wrap icon-blue">🔌</div>
-        <h3>18 Built-in MCPs</h3>
-        <p>GitHub, Email, Redis, PostgreSQL, MongoDB, Slack, Jira, PDF, CSV, Clipboard + 8 core servers. Zero downloads needed.</p>
+        <h3>26 Built-in MCPs</h3>
+        <p>GitHub, Email, Redis, PostgreSQL, MongoDB, Slack, Jira, PDF, CSV, Clipboard, Google Drive, S3, FTP, Dropbox, Notion, Linear, Stripe, Supabase + core servers. Zero downloads needed.</p>
       </div>
       <div class="card">
         <div class="feature-icon-wrap icon-purple">💾</div>

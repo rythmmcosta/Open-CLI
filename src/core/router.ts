@@ -15,13 +15,14 @@ import { HuggingFaceProvider, HF_MODELS } from '../providers/huggingface';
 import { CohereProvider, COHERE_MODELS } from '../providers/cohere';
 import { AzureProvider, AZURE_MODELS } from '../providers/azure';
 import { BedrockProvider, BEDROCK_MODELS } from '../providers/bedrock';
+import { OpenRouterProvider, OPENROUTER_FREE_MODELS } from '../providers/openrouter';
 import { AppConfig } from '../types';
 
 export type ProviderName =
   | 'anthropic' | 'openai' | 'gemini' | 'ollama'
   | 'mistral' | 'groq' | 'moonshot' | 'xai' | 'deepseek'
   | 'together' | 'perplexity' | 'cerebras' | 'huggingface'
-  | 'cohere' | 'azure' | 'bedrock';
+  | 'cohere' | 'azure' | 'bedrock' | 'openrouter';
 
 export function getProviderName(model: string): ProviderName {
   if (model.startsWith('claude'))                         return 'anthropic';

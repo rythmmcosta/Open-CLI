@@ -82,6 +82,7 @@ export interface ProviderConfig {
   cerebras?: { apiKey: string };
   huggingface?: { apiKey: string };
   cohere?: { apiKey: string };
+  openrouter?: { apiKey: string };
   azure?: { apiKey: string; endpoint: string; deploymentName: string; apiVersion?: string };
   bedrock?: { accessKeyId: string; secretAccessKey: string; region: string; sessionToken?: string };
   github?: { token: string };

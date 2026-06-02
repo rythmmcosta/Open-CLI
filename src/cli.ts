@@ -33,7 +33,10 @@ program
   .option('-v, --verbose', 'Show raw tool calls and responses')
   .option('-c, --context <file>', 'Inject a file into the initial context')
   .option('--browser', 'Enable browser automation tools for this session')
-  .option('--notify', 'Send Telegram/Discord notification when done');
+  .option('--notify', 'Send Telegram/Discord notification when done')
+  .option('--ensemble', 'Query all configured AI providers simultaneously and synthesize the best answer')
+  .option('--ensemble-free', 'Use only free-tier AI providers for ensemble mode')
+  .option('--top <n>', 'Limit ensemble to top N providers (default: all)');
 
 // ── auth ──────────────────────────────────────────────────────────────
 program
@@ -361,6 +364,48 @@ program
     process.exit(0);
   });
 
+// ── workspace ─────────────────────────────────────────────────────────
+program
+  .command('workspace')
+  .description('Show all active Open CLI windows for this project')
+  .action(async () => {
+    const { IPCClient } = await import('./ipc/client');
+    const client = new IPCClient(process.cwd());
+    try {
+      await client.connect();
+      const ctx = await client.getContext();
+      console.log('\n' + C.blue.bold('  ⚡ Active Workspace Windows'));
+      if (ctx.activeWindows.length === 0) {
+        console.log(C.dim('  No other windows connected\n'));
+      } else {
+        for (const w of ctx.activeWindows) {
+          console.log(`  ${C.green(w.windowId)} ${C.dim('pid:' + w.pid)} ${w.currentFile ? C.yellow('→ ' + w.currentFile) : ''}`);
+          if (w.lastAction) console.log(`  ${' '.repeat(2)}${C.dim(w.lastAction)}`);
+        }
+      }
+      if (ctx.recentActions.length) {
+        console.log('\n' + C.dim('  Recent actions:'));
+        ctx.recentActions.forEach(a => console.log('  ' + C.dim('• ' + a)));
+      }
+      console.log();
+    } catch {
+      console.log(C.dim('\n  No coordinator running (open multiple windows in the same project to enable)\n'));
+    }
+    client.disconnect();
+    process.exit(0);
+  });
+
+// ── sync ──────────────────────────────────────────────────────────────
+program
+  .command('sync')
+  .description('Cross-device project sync (account required)')
+  .argument('[subcommand]', 'login, register, logout, push, pull, list, status')
+  .action(async (sub: string | undefined) => {
+    const { runSync } = await import('./commands/sync');
+    await runSync(sub, []);
+    process.exit(0);
+  });
+
 // ── main action ───────────────────────────────────────────────────────
 program.action(async (prompt: string | undefined, opts: Record<string, unknown>) => {
   if (opts.color === false) process.env.NO_COLOR = '1';
@@ -397,8 +442,20 @@ program.action(async (prompt: string | undefined, opts: Record<string, unknown>)
       process.exit(1);
     }
 
-    const context = new ConversationContext(config.contextWindow);
     const query = prompt || 'Process the piped input as instructed';
+
+    // ── Ensemble mode ────────────────────────────────────────────────
+    if (opts.ensemble || opts.ensembleFree) {
+      const { runEnsemble } = await import('./core/ensemble');
+      await runEnsemble(query, [], config, {
+        onlyFree: !!opts.ensembleFree,
+        topN: opts.top ? parseInt(opts.top as string) : undefined,
+        verbose: !!opts.verbose,
+      });
+      process.exit(0);
+    }
+
+    const context = new ConversationContext(config.contextWindow);
 
     try {
       await runAgent(query, context, config, {
