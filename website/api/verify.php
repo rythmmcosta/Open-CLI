@@ -18,6 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/jwt.php';
+require_once __DIR__ . '/rate-limit.php';
+
+$pdo = db();
+$ip  = getClientIp();
+
+// Rate limit: 10 OTP attempts per 30 minutes per IP
+checkRateLimit($pdo, $ip, 'verify', 10, 30);
 
 $body  = json_decode(file_get_contents('php://input'), true);
 $email = trim($body['email'] ?? '');
@@ -28,8 +35,6 @@ if (!$email || !$otp) {
     echo json_encode(['success' => false, 'error' => 'email and otp are required']);
     exit;
 }
-
-$pdo = db();
 
 // Fetch user
 $stmt = $pdo->prepare('SELECT id, name, is_verified FROM users WHERE email = ?');
@@ -50,14 +55,16 @@ $stmt->execute([$user['id'], $otp]);
 $row = $stmt->fetch();
 
 if (!$row) {
+    recordAttempt($pdo, $ip, 'verify');
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Invalid or expired OTP']);
     exit;
 }
 
-// Mark verified + delete OTP
+// Successful verification — mark verified, delete OTP, clear rate limit
 $pdo->prepare('UPDATE users SET is_verified = 1 WHERE id = ?')->execute([$user['id']]);
 $pdo->prepare('DELETE FROM otps WHERE user_id = ?')->execute([$user['id']]);
+clearAttempts($pdo, $ip, 'verify');
 
 $token = jwt_encode(['user_id' => $user['id'], 'email' => $email]);
 

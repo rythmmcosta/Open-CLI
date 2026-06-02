@@ -2,6 +2,7 @@
 // ============================================================
 // Open CLI — POST /api/register
 // Body: { email, password, name }
+//   or: { email, resend: true }  — resend OTP to existing unverified user
 // Returns: { success: true, message: "OTP sent" }
 // ============================================================
 header('Content-Type: application/json');
@@ -18,9 +19,51 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/mailer.php';
 
-$body = json_decode(file_get_contents('php://input'), true);
-$email    = trim($body['email']    ?? '');
+$body  = json_decode(file_get_contents('php://input'), true);
+$email = trim($body['email'] ?? '');
+$resend = !empty($body['resend']);
+
+// ── Resend OTP for existing unverified user ──────────────────
+if ($resend) {
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(422);
+        echo json_encode(['success' => false, 'error' => 'Invalid email address']);
+        exit;
+    }
+
+    $pdo = db();
+    $stmt = $pdo->prepare('SELECT id, name, is_verified FROM users WHERE email = ?');
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
+
+    if (!$user) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'error' => 'No account found with that email']);
+        exit;
+    }
+
+    if ($user['is_verified']) {
+        http_response_code(409);
+        echo json_encode(['success' => false, 'error' => 'Account is already verified']);
+        exit;
+    }
+
+    $otp    = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    $expiry = date('Y-m-d H:i:s', time() + OTP_EXPIRY_MINUTES * 60);
+
+    $pdo->prepare('DELETE FROM otps WHERE user_id = ?')->execute([$user['id']]);
+    $pdo->prepare('INSERT INTO otps (user_id, otp, expires_at) VALUES (?, ?, ?)')
+        ->execute([$user['id'], $otp, $expiry]);
+
+    sendMail($email, $user['name'], 'Your Open CLI verification code', otpEmailHtml($user['name'], $otp));
+
+    echo json_encode(['success' => true, 'message' => 'OTP resent to ' . $email]);
+    exit;
+}
+
+// ── New registration ─────────────────────────────────────────
 $password = trim($body['password'] ?? '');
 $name     = trim($body['name']     ?? '');
 
@@ -71,9 +114,6 @@ $pdo->prepare('INSERT INTO otps (user_id, otp, expires_at) VALUES (?, ?, ?)')
     ->execute([$userId, $otp, $expiry]);
 
 // Send OTP email
-$subject = 'Your Open CLI verification code';
-$message = "Hi $name,\n\nYour verification code is: $otp\n\nIt expires in " . OTP_EXPIRY_MINUTES . " minutes.\n\nIf you didn't request this, ignore this email.\n\n— Open CLI";
-$headers = 'From: ' . MAIL_FROM . "\r\nReply-To: " . MAIL_FROM;
-mail($email, $subject, $message, $headers);
+$sent = sendMail($email, $name, 'Your Open CLI verification code', otpEmailHtml($name, $otp));
 
 echo json_encode(['success' => true, 'message' => 'OTP sent to ' . $email]);
