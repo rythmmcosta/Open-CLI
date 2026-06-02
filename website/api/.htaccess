@@ -1,7 +1,9 @@
 RewriteEngine On
-Header set Access-Control-Allow-Origin "https://opencli.myowncloud.tech"
-Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
-Header set Access-Control-Allow-Headers "Authorization, Content-Type"
+Header always set Access-Control-Allow-Origin "https://opencli.myowncloud.tech"
+Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+Header always set Access-Control-Allow-Headers "Authorization, Content-Type"
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule .* - [R=204,L]
 
 # Block direct access to config and helper files
 <FilesMatch "^(config|db|jwt)\.php$">

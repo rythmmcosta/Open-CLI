@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash       VARCHAR(255)    NOT NULL,
     name                VARCHAR(100)    NOT NULL DEFAULT '',
     is_verified         TINYINT(1)      NOT NULL DEFAULT 0,
-    quota_bytes         BIGINT UNSIGNED NOT NULL DEFAULT 524288000, -- 500 MB
+    quota_bytes         BIGINT UNSIGNED NOT NULL DEFAULT 536870912, -- 512 MB
     storage_used_bytes  BIGINT UNSIGNED NOT NULL DEFAULT 0,
     created_at          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
