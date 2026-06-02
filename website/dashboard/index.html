@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Open CLI</title>
+  <meta name="description" content="Open CLI user dashboard — manage synced projects, API keys, devices, and settings.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#070b14">
+  <!-- Vue 3 CDN -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Auth pages (shown when not logged in) -->
+    <div v-if="!isLoggedIn" class="auth-wrapper">
+      <!-- Login Form -->
+      <div v-if="authView === 'login'" class="auth-card">
+        <div class="auth-logo">⚡ Open CLI</div>
+        <h2>Sign in to your account</h2>
+        <p class="auth-subtitle">Access your synced projects, API keys, and settings</p>
+
+        <form @submit.prevent="doLogin">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" v-model="loginForm.email" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" v-model="loginForm.password" placeholder="••••••••" required>
+          </div>
+          <div v-if="authError" class="auth-error">{{ authError }}</div>
+          <button type="submit" class="btn-primary full-width" :disabled="authLoading">
+            {{ authLoading ? 'Signing in...' : 'Sign In' }}
+          </button>
+        </form>
+
+        <div class="auth-divider"><span>or continue with</span></div>
+
+        <div class="oauth-buttons">
+          <button class="btn-oauth google" @click="oauthGoogle">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Google
+          </button>
+          <button class="btn-oauth facebook" @click="oauthFacebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            Facebook
+          </button>
+        </div>
+
+        <p class="auth-switch">Don't have an account? <a @click="authView = 'register'">Register</a></p>
+      </div>
+
+      <!-- Register Form -->
+      <div v-if="authView === 'register'" class="auth-card">
+        <div class="auth-logo">⚡ Open CLI</div>
+        <h2>Create your account</h2>
+        <p class="auth-subtitle">Free · 512MB storage · Cross-device sync</p>
+
+        <form @submit.prevent="doRegister">
+          <div class="form-group">
+            <label>Display Name</label>
+            <input type="text" v-model="registerForm.name" placeholder="Your name" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" v-model="registerForm.email" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" v-model="registerForm.password" placeholder="Min 8 characters" required minlength="8">
+          </div>
+          <div v-if="authError" class="auth-error">{{ authError }}</div>
+          <button type="submit" class="btn-primary full-width" :disabled="authLoading">
+            {{ authLoading ? 'Creating account...' : 'Create Account' }}
+          </button>
+        </form>
+
+        <p class="auth-switch">Already have an account? <a @click="authView = 'login'">Sign in</a></p>
+      </div>
+
+      <!-- OTP Verification -->
+      <div v-if="authView === 'otp'" class="auth-card">
+        <div class="auth-logo">📧</div>
+        <h2>Verify your email</h2>
+        <p class="auth-subtitle">Enter the 6-digit code sent to {{ registerForm.email }}</p>
+        <form @submit.prevent="doVerify">
+          <div class="form-group">
+            <input type="text" v-model="otpCode" placeholder="000000" maxlength="6" pattern="[0-9]{6}" class="otp-input" required>
+          </div>
+          <div v-if="authError" class="auth-error">{{ authError }}</div>
+          <button type="submit" class="btn-primary full-width" :disabled="authLoading">
+            {{ authLoading ? 'Verifying...' : 'Verify Code' }}
+          </button>
+          <button type="button" class="btn-outline full-width" style="margin-top:8px" @click="resendOtp" :disabled="otpCooldown > 0">
+            {{ otpCooldown > 0 ? `Resend in ${otpCooldown}s` : 'Resend Code' }}
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Dashboard layout (shown when logged in) -->
+    <div v-if="isLoggedIn" class="dash-layout">
+      <!-- Sidebar -->
+      <aside class="dash-sidebar" :class="{ collapsed: sidebarCollapsed }">
+        <div class="sidebar-brand">
+          <span class="brand-icon">⚡</span>
+          <span class="brand-text">Open CLI</span>
+        </div>
+        <nav class="sidebar-nav">
+          <a v-for="item in navItems" :key="item.id" class="nav-item" :class="{ active: currentView === item.id }" @click="navigate(item.id)">
+            <span class="nav-icon">{{ item.icon }}</span>
+            <span class="nav-label">{{ item.label }}</span>
+          </a>
+        </nav>
+        <div class="sidebar-user">
+          <img :src="userAvatar" class="user-avatar-sm" @error="avatarError">
+          <div class="sidebar-user-info">
+            <div class="sidebar-user-name">{{ user.name }}</div>
+            <div class="sidebar-user-email">{{ user.email }}</div>
+          </div>
+        </div>
+        <button class="sidebar-collapse-btn" @click="sidebarCollapsed = !sidebarCollapsed">{{ sidebarCollapsed ? '→' : '←' }}</button>
+      </aside>
+
+      <!-- Main area -->
+      <div class="dash-main">
+        <!-- Top header -->
+        <header class="dash-header">
+          <div class="header-left">
+            <button class="mobile-menu-btn" @click="sidebarCollapsed = !sidebarCollapsed">☰</button>
+            <div class="header-breadcrumb">
+              <span>Dashboard</span>
+              <span v-if="currentView !== 'home'"> / {{ currentViewLabel }}</span>
+            </div>
+          </div>
+          <div class="header-right">
+            <div class="header-search">
+              <input type="text" v-model="globalSearch" placeholder="Search..." @input="doSearch">
+            </div>
+            <button class="header-icon-btn notif-btn" @click="notifOpen = !notifOpen">
+              🔔
+              <span v-if="unreadNotifs > 0" class="notif-badge">{{ unreadNotifs }}</span>
+            </button>
+            <div class="header-avatar-menu">
+              <img :src="userAvatar" class="header-avatar" @click="profileMenuOpen = !profileMenuOpen" @error="avatarError">
+              <div v-if="profileMenuOpen" class="avatar-dropdown">
+                <a @click="navigate('settings-profile')">Profile</a>
+                <a @click="navigate('settings-security')">Security</a>
+                <hr>
+                <a @click="doLogout" class="danger">Logout</a>
+              </div>
+            </div>
+          </div>
+          <!-- Notification panel -->
+          <div v-if="notifOpen" class="notif-panel">
+            <div class="notif-header">
+              <strong>Notifications</strong>
+              <a @click="markAllRead">Mark all read</a>
+            </div>
+            <div v-if="notifications.length === 0" class="notif-empty">No notifications</div>
+            <div v-for="n in notifications" :key="n.id" class="notif-item" :class="{ unread: !n.read }">
+              <span class="notif-icon">{{ n.icon }}</span>
+              <div>
+                <div class="notif-msg">{{ n.message }}</div>
+                <div class="notif-time">{{ n.time }}</div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Content -->
+        <main class="dash-content">
+
+          <!-- HOME -->
+          <div v-if="currentView === 'home'" class="view-home">
+            <h1 class="view-title">Welcome back, {{ user.name.split(' ')[0] }} 👋</h1>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon">💾</div>
+                <div class="stat-body">
+                  <div class="stat-value">{{ formatBytes(quota.used) }}</div>
+                  <div class="stat-label">Storage Used</div>
+                  <div class="quota-bar"><div class="quota-fill" :style="{ width: quotaPct + '%' }"></div></div>
+                  <div class="stat-sub">of {{ formatBytes(quota.total) }}</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">📁</div>
+                <div class="stat-body">
+                  <div class="stat-value">{{ projects.length }}</div>
+                  <div class="stat-label">Projects Synced</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">💻</div>
+                <div class="stat-body">
+                  <div class="stat-value">{{ devices.length }}</div>
+                  <div class="stat-label">Devices</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">🔑</div>
+                <div class="stat-body">
+                  <div class="stat-value">{{ apiKeys.length }}</div>
+                  <div class="stat-label">API Keys</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="home-grid">
+              <div class="card">
+                <h3>Recent Activity</h3>
+                <div v-if="activity.length === 0" class="empty-state">No recent activity</div>
+                <div v-for="a in activity.slice(0,8)" :key="a.id" class="activity-item">
+                  <span class="activity-icon">{{ a.icon }}</span>
+                  <div class="activity-body">
+                    <div class="activity-msg">{{ a.message }}</div>
+                    <div class="activity-time">{{ a.time }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <h3>Quick Actions</h3>
+                <div class="quick-actions">
+                  <button class="quick-btn" @click="copyInstall">
+                    <span>📋</span> Copy install command
+                  </button>
+                  <button class="quick-btn" @click="navigate('files')">
+                    <span>📁</span> View synced projects
+                  </button>
+                  <button class="quick-btn" @click="navigate('generate-image')">
+                    <span>🖼</span> Generate image
+                  </button>
+                  <button class="quick-btn" @click="navigate('api-keys')">
+                    <span>🔑</span> Manage API keys
+                  </button>
+                  <button class="quick-btn" @click="navigate('snippets')">
+                    <span>⚡</span> CLI Snippets
+                  </button>
+                  <button class="quick-btn" @click="navigate('help')">
+                    <span>❓</span> Documentation
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FILES -->
+          <div v-if="currentView === 'files'" class="view-files">
+            <div class="view-header">
+              <h1 class="view-title">Synced Projects</h1>
+              <button class="btn-primary" @click="navigate('sync')">New Sync</button>
+            </div>
+            <div class="search-bar"><input type="text" v-model="fileSearch" placeholder="Search projects..."></div>
+            <div v-if="filteredProjects.length === 0" class="empty-state">No synced projects. Run <code>opencli sync push</code> from your terminal.</div>
+            <table class="data-table" v-else>
+              <thead><tr><th>Project</th><th>Size</th><th>Last Sync</th><th>Device</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr v-for="p in filteredProjects" :key="p.id">
+                  <td><strong>{{ p.project_name }}</strong></td>
+                  <td>{{ formatBytes(p.size_bytes) }}</td>
+                  <td>{{ formatDate(p.uploaded_at) }}</td>
+                  <td>{{ p.device_name || 'Unknown' }}</td>
+                  <td>
+                    <button class="btn-sm" @click="downloadProject(p)">↓ Download</button>
+                    <button class="btn-sm danger" @click="deleteProject(p)">Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- SYNC -->
+          <div v-if="currentView === 'sync'" class="view-sync">
+            <h1 class="view-title">Sync History</h1>
+            <div class="sync-commands card">
+              <h3>CLI Commands</h3>
+              <div class="code-block"><code>opencli sync push    # push current project to cloud</code></div>
+              <div class="code-block"><code>opencli sync pull    # pull latest from cloud</code></div>
+              <div class="code-block"><code>opencli sync list    # list all cloud projects</code></div>
+              <div class="code-block"><code>opencli sync status  # show quota and last sync</code></div>
+            </div>
+            <div class="empty-state" style="margin-top:32px">Sync history coming soon. Run <code>opencli sync push</code> to start.</div>
+          </div>
+
+          <!-- DEVICES -->
+          <div v-if="currentView === 'devices'" class="view-devices">
+            <h1 class="view-title">Devices</h1>
+            <div v-if="devices.length === 0" class="empty-state">No devices registered. Use opencli sync push from a device to register it.</div>
+            <div class="devices-grid">
+              <div v-for="d in devices" :key="d.id" class="device-card">
+                <div class="device-icon">{{ d.os === 'windows' ? '🪟' : d.os === 'macos' ? '🍎' : d.os === 'android' ? '🤖' : '🖥' }}</div>
+                <div class="device-info">
+                  <div class="device-name">{{ d.device_name || 'Unknown Device' }}</div>
+                  <div class="device-meta">Last sync: {{ formatDate(d.last_sync) }}</div>
+                </div>
+                <button class="btn-sm danger" @click="revokeDevice(d)">Revoke</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- API KEYS -->
+          <div v-if="currentView === 'api-keys'" class="view-apikeys">
+            <div class="view-header">
+              <h1 class="view-title">API Keys</h1>
+              <button class="btn-primary" @click="showNewKeyModal = true">Generate Key</button>
+            </div>
+            <div v-if="apiKeys.length === 0" class="empty-state">No API keys yet. Generate one to use Open CLI sync from scripts.</div>
+            <table class="data-table" v-else>
+              <thead><tr><th>Name</th><th>Created</th><th>Last Used</th><th>Key</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr v-for="k in apiKeys" :key="k.id">
+                  <td><strong>{{ k.name }}</strong></td>
+                  <td>{{ formatDate(k.created_at) }}</td>
+                  <td>{{ k.last_used ? formatDate(k.last_used) : 'Never' }}</td>
+                  <td><code class="masked-key">{{ k.masked }}</code></td>
+                  <td>
+                    <button class="btn-sm" @click="copyKey(k)">Copy</button>
+                    <button class="btn-sm danger" @click="revokeKey(k)">Revoke</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- New key modal -->
+            <div v-if="showNewKeyModal" class="modal-overlay" @click.self="showNewKeyModal = false">
+              <div class="modal">
+                <h3>Generate New API Key</h3>
+                <div class="form-group">
+                  <label>Key Name</label>
+                  <input type="text" v-model="newKeyName" placeholder="e.g. My Script">
+                </div>
+                <div class="modal-footer">
+                  <button class="btn-outline" @click="showNewKeyModal = false">Cancel</button>
+                  <button class="btn-primary" @click="generateKey">Generate</button>
+                </div>
+              </div>
+            </div>
+            <!-- Show generated key -->
+            <div v-if="generatedKey" class="modal-overlay" @click.self="generatedKey = null">
+              <div class="modal">
+                <h3>Your New API Key</h3>
+                <p style="color:#64748b;font-size:0.85rem">Copy this key now — it won't be shown again.</p>
+                <div class="code-block copyable" @click="copyText(generatedKey)">{{ generatedKey }}</div>
+                <button class="btn-primary full-width" @click="generatedKey = null">Done</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ANALYTICS -->
+          <div v-if="currentView === 'analytics'" class="view-analytics">
+            <h1 class="view-title">Analytics</h1>
+            <div class="analytics-grid">
+              <div class="card">
+                <h3>Storage Usage</h3>
+                <canvas id="storageChart" height="200"></canvas>
+              </div>
+              <div class="card">
+                <h3>Sync Activity (30 days)</h3>
+                <canvas id="syncChart" height="200"></canvas>
+              </div>
+            </div>
+            <div class="card" style="margin-top:20px">
+              <h3>Usage Summary</h3>
+              <table class="data-table">
+                <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+                <tbody>
+                  <tr><td>Total projects synced</td><td>{{ projects.length }}</td></tr>
+                  <tr><td>Total storage used</td><td>{{ formatBytes(quota.used) }}</td></tr>
+                  <tr><td>Storage available</td><td>{{ formatBytes(quota.total - quota.used) }}</td></tr>
+                  <tr><td>Devices registered</td><td>{{ devices.length }}</td></tr>
+                  <tr><td>API keys active</td><td>{{ apiKeys.length }}</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- SKILLS BROWSER -->
+          <div v-if="currentView === 'skills'" class="view-skills">
+            <h1 class="view-title">Skills Browser</h1>
+            <div class="search-bar"><input type="text" v-model="skillSearch" placeholder="Search 52 skills..."></div>
+            <div class="skills-grid-dash">
+              <div v-for="s in filteredSkills" :key="s.id" class="skill-card-dash" @click="selectedSkill = s">
+                <span class="skill-icon-dash">{{ s.icon }}</span>
+                <div>
+                  <div class="skill-name-dash">{{ s.name }}</div>
+                  <div class="skill-cat-dash">{{ s.category }}</div>
+                </div>
+              </div>
+            </div>
+            <div v-if="selectedSkill" class="skill-detail-panel">
+              <div class="skill-detail-head">
+                <span class="skill-icon-dash lg">{{ selectedSkill.icon }}</span>
+                <div>
+                  <h3>{{ selectedSkill.name }}</h3>
+                  <span class="skill-cat-badge">{{ selectedSkill.category }}</span>
+                </div>
+                <button class="close-btn" @click="selectedSkill = null">✕</button>
+              </div>
+              <p>{{ selectedSkill.description }}</p>
+              <div class="skill-command">
+                <code>opencli --skill {{ selectedSkill.id }} "your task"</code>
+                <button @click="copyText('opencli --skill ' + selectedSkill.id + ' &quot;your task&quot;')">📋</button>
+              </div>
+              <div class="skill-tags-dash">
+                <span v-for="t in selectedSkill.tags" :key="t" class="tag-chip">{{ t }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- IMAGE GENERATOR -->
+          <div v-if="currentView === 'generate-image'" class="view-imagegen">
+            <h1 class="view-title">Image Generator</h1>
+            <div class="gen-form card">
+              <div class="form-group">
+                <label>Prompt</label>
+                <textarea v-model="imagePrompt" rows="3" placeholder="A dark terminal UI for a tech blog..."></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Provider</label>
+                  <select v-model="imageProvider">
+                    <option value="">Auto (Pollinations - free)</option>
+                    <option value="huggingface">HuggingFace FLUX</option>
+                    <option value="dalle">DALL-E 3</option>
+                    <option value="stability">Stability AI</option>
+                    <option value="ideogram">Ideogram v2</option>
+                    <option value="fal">fal.ai</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Size</label>
+                  <select v-model="imageSize">
+                    <option value="1024x1024">1024×1024</option>
+                    <option value="512x512">512×512</option>
+                    <option value="1280x720">1280×720</option>
+                  </select>
+                </div>
+              </div>
+              <div class="gen-note">
+                <span>💡</span> This generates images using <code>opencli --image</code> CLI command. Run it in your terminal.
+              </div>
+              <div class="gen-cli-output">
+                <strong>CLI Command:</strong><br>
+                <code>opencli --image "{{ imagePrompt || 'your prompt' }}"{{ imageProvider ? ' --provider ' + imageProvider : '' }}</code>
+                <button class="btn-sm" @click="copyImageCmd" style="margin-left:12px">Copy</button>
+              </div>
+            </div>
+            <div class="card" style="margin-top:20px">
+              <h3>Generated Images</h3>
+              <p style="color:#64748b;font-size:0.85rem">Images generated via CLI are saved to <code>./generated/img-*.png</code> in your project folder.</p>
+              <div class="gen-gallery" v-if="generatedImages.length > 0">
+                <img v-for="img in generatedImages" :key="img" :src="img" class="gen-thumb">
+              </div>
+              <div v-else class="empty-state">No images yet. Run <code>opencli --image "prompt"</code> in your terminal.</div>
+            </div>
+          </div>
+
+          <!-- PROFILE SETTINGS -->
+          <div v-if="currentView === 'settings-profile'" class="view-profile">
+            <h1 class="view-title">Profile</h1>
+            <div class="profile-card card">
+              <div class="avatar-section">
+                <img :src="userAvatar" class="avatar-lg" @error="avatarError">
+                <div>
+                  <h3>{{ user.name }}</h3>
+                  <p style="color:#64748b">{{ user.email }}</p>
+                  <label class="btn-outline avatar-upload-btn">
+                    Change Avatar
+                    <input type="file" accept="image/jpeg,image/png,image/webp" @change="uploadAvatar" style="display:none">
+                  </label>
+                </div>
+              </div>
+              <hr class="divider">
+              <form @submit.prevent="saveProfile">
+                <div class="form-group">
+                  <label>Display Name</label>
+                  <input type="text" v-model="profileForm.name" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                  <label>Email <span style="color:#64748b;font-size:0.75rem">(contact support to change)</span></label>
+                  <input type="email" v-model="user.email" disabled style="opacity:0.5">
+                </div>
+                <div v-if="profileMsg" class="success-msg">{{ profileMsg }}</div>
+                <button type="submit" class="btn-primary">Save Changes</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- SECURITY SETTINGS -->
+          <div v-if="currentView === 'settings-security'" class="view-security">
+            <h1 class="view-title">Security</h1>
+            <div class="card">
+              <h3>Change Password</h3>
+              <form @submit.prevent="changePassword">
+                <div class="form-group">
+                  <label>Current Password</label>
+                  <input type="password" v-model="pwForm.current" placeholder="Current password">
+                </div>
+                <div class="form-group">
+                  <label>New Password</label>
+                  <input type="password" v-model="pwForm.newPw" placeholder="New password (min 8 chars)" minlength="8">
+                </div>
+                <div class="form-group">
+                  <label>Confirm New Password</label>
+                  <input type="password" v-model="pwForm.confirm" placeholder="Confirm new password">
+                </div>
+                <div v-if="pwMsg" :class="pwMsg.startsWith('✓') ? 'success-msg' : 'auth-error'">{{ pwMsg }}</div>
+                <button type="submit" class="btn-primary">Update Password</button>
+              </form>
+            </div>
+            <div class="card" style="margin-top:20px">
+              <h3>Active Sessions</h3>
+              <div v-for="s in sessions" :key="s.id" class="session-item">
+                <span>{{ s.device }}</span>
+                <span class="session-time">{{ formatDate(s.last_active) }}</span>
+                <button class="btn-sm danger" @click="revokeSession(s)">Revoke</button>
+              </div>
+              <div v-if="sessions.length === 0" class="empty-state">No active sessions</div>
+            </div>
+          </div>
+
+          <!-- APPEARANCE SETTINGS -->
+          <div v-if="currentView === 'settings-appearance'" class="view-appearance">
+            <h1 class="view-title">Appearance</h1>
+            <div class="card">
+              <h3>Theme</h3>
+              <div class="theme-options">
+                <button class="theme-btn" :class="{ active: theme === 'dark' }" @click="setTheme('dark')">🌙 Dark</button>
+                <button class="theme-btn" :class="{ active: theme === 'light' }" @click="setTheme('light')">☀️ Light</button>
+                <button class="theme-btn" :class="{ active: theme === 'system' }" @click="setTheme('system')">💻 System</button>
+              </div>
+              <h3 style="margin-top:24px">Accent Color</h3>
+              <div class="color-options">
+                <button v-for="c in accentColors" :key="c.name" class="color-btn" :style="{ background: c.hex }" :class="{ active: accentColor === c.name }" @click="setAccent(c.name, c.hex)" :title="c.name"></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUOTA & BILLING -->
+          <div v-if="currentView === 'quota'" class="view-quota">
+            <h1 class="view-title">Quota & Storage</h1>
+            <div class="card">
+              <h3>Storage Quota</h3>
+              <div class="quota-display">
+                <div class="quota-numbers">
+                  <span class="quota-used">{{ formatBytes(quota.used) }}</span>
+                  <span class="quota-sep"> / </span>
+                  <span class="quota-total">{{ formatBytes(quota.total) }}</span>
+                </div>
+                <div class="quota-bar-lg">
+                  <div class="quota-fill-lg" :style="{ width: quotaPct + '%', background: quotaPct > 90 ? '#ef4444' : quotaPct > 70 ? '#f59e0b' : 'var(--green)' }"></div>
+                </div>
+                <div class="quota-pct">{{ quotaPct.toFixed(1) }}% used</div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:20px">
+              <h3>By Project</h3>
+              <table class="data-table">
+                <thead><tr><th>Project</th><th>Size</th><th>%</th></tr></thead>
+                <tbody>
+                  <tr v-for="p in projects" :key="p.id">
+                    <td>{{ p.project_name }}</td>
+                    <td>{{ formatBytes(p.size_bytes) }}</td>
+                    <td>{{ quota.used > 0 ? ((p.size_bytes / quota.total) * 100).toFixed(1) : 0 }}%</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div v-if="projects.length === 0" class="empty-state">No projects synced yet</div>
+            </div>
+          </div>
+
+          <!-- ACTIVITY LOG -->
+          <div v-if="currentView === 'activity'" class="view-activity">
+            <h1 class="view-title">Activity Log</h1>
+            <div class="filter-row">
+              <button class="filter-tab" :class="{ active: actFilter === 'all' }" @click="actFilter = 'all'">All</button>
+              <button class="filter-tab" :class="{ active: actFilter === 'login' }" @click="actFilter = 'login'">Logins</button>
+              <button class="filter-tab" :class="{ active: actFilter === 'sync' }" @click="actFilter = 'sync'">Syncs</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Action</th><th>Device</th><th>Time</th></tr></thead>
+              <tbody>
+                <tr v-for="a in filteredActivity" :key="a.id">
+                  <td><span class="activity-icon">{{ a.icon }}</span> {{ a.message }}</td>
+                  <td>{{ a.device || '—' }}</td>
+                  <td>{{ formatDate(a.time) }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-if="filteredActivity.length === 0" class="empty-state">No activity found</div>
+          </div>
+
+          <!-- SNIPPETS -->
+          <div v-if="currentView === 'snippets'" class="view-snippets">
+            <div class="view-header">
+              <h1 class="view-title">CLI Snippets</h1>
+              <button class="btn-primary" @click="showNewSnippet = true">+ New Snippet</button>
+            </div>
+            <div v-if="snippets.length === 0" class="empty-state">No snippets yet. Save your favorite CLI commands.</div>
+            <div class="snippets-list">
+              <div v-for="s in snippets" :key="s.id" class="snippet-item">
+                <div class="snippet-head">
+                  <strong>{{ s.name }}</strong>
+                  <div>
+                    <button class="btn-sm" @click="copyText(s.command)">📋 Copy</button>
+                    <button class="btn-sm danger" @click="deleteSnippet(s)">Delete</button>
+                  </div>
+                </div>
+                <code class="snippet-cmd">{{ s.command }}</code>
+                <div v-if="s.tags" class="snippet-tags">
+                  <span v-for="t in s.tags.split(',')" :key="t" class="tag-chip">{{ t.trim() }}</span>
+                </div>
+              </div>
+            </div>
+            <div v-if="showNewSnippet" class="modal-overlay" @click.self="showNewSnippet = false">
+              <div class="modal">
+                <h3>New Snippet</h3>
+                <div class="form-group">
+                  <label>Name</label>
+                  <input type="text" v-model="newSnippet.name" placeholder="e.g. Ensemble query">
+                </div>
+                <div class="form-group">
+                  <label>Command</label>
+                  <input type="text" v-model="newSnippet.command" placeholder="opencli --ensemble ...">
+                </div>
+                <div class="form-group">
+                  <label>Tags (comma separated)</label>
+                  <input type="text" v-model="newSnippet.tags" placeholder="ai, ensemble, free">
+                </div>
+                <div class="modal-footer">
+                  <button class="btn-outline" @click="showNewSnippet = false">Cancel</button>
+                  <button class="btn-primary" @click="saveSnippet">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- WEBHOOKS -->
+          <div v-if="currentView === 'webhooks'" class="view-webhooks">
+            <div class="view-header">
+              <h1 class="view-title">Webhooks</h1>
+              <button class="btn-primary" @click="showNewWebhook = true">+ Add Webhook</button>
+            </div>
+            <div v-if="webhooks.length === 0" class="empty-state">No webhooks configured. Add a URL to receive push/pull notifications.</div>
+            <div class="webhooks-list">
+              <div v-for="w in webhooks" :key="w.id" class="webhook-item card">
+                <div class="webhook-head">
+                  <code>{{ w.url }}</code>
+                  <span class="badge-green">{{ w.event }}</span>
+                </div>
+                <div class="webhook-actions">
+                  <button class="btn-sm" @click="testWebhook(w)">Test</button>
+                  <button class="btn-sm danger" @click="deleteWebhook(w)">Delete</button>
+                </div>
+              </div>
+            </div>
+            <div v-if="showNewWebhook" class="modal-overlay" @click.self="showNewWebhook = false">
+              <div class="modal">
+                <h3>Add Webhook</h3>
+                <div class="form-group">
+                  <label>Webhook URL</label>
+                  <input type="url" v-model="newWebhook.url" placeholder="https://your-server.com/webhook">
+                </div>
+                <div class="form-group">
+                  <label>Event</label>
+                  <select v-model="newWebhook.event">
+                    <option value="sync">On Sync</option>
+                    <option value="quota_warning">Quota Warning</option>
+                    <option value="login">On Login</option>
+                  </select>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn-outline" @click="showNewWebhook = false">Cancel</button>
+                  <button class="btn-primary" @click="saveWebhook">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROVIDER STATUS -->
+          <div v-if="currentView === 'providers'" class="view-providers">
+            <h1 class="view-title">AI Provider Status</h1>
+            <p style="color:#64748b;margin-bottom:24px">Check which AI providers are available. Configure via <code>opencli auth</code>.</p>
+            <div class="providers-status-grid">
+              <div v-for="p in providerStatus" :key="p.name" class="provider-status-card">
+                <span class="prov-logo">{{ p.icon }}</span>
+                <div class="prov-info">
+                  <div class="prov-name">{{ p.name }}</div>
+                  <div class="prov-status" :class="p.status">{{ p.status === 'configured' ? '✅ Configured' : p.status === 'free' ? '🆓 Free' : '⚙️ Needs setup' }}</div>
+                </div>
+                <a :href="p.docsUrl" target="_blank" class="btn-sm">Docs</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- HELP -->
+          <div v-if="currentView === 'help'" class="view-help">
+            <h1 class="view-title">Help & Support</h1>
+            <div class="help-grid">
+              <div class="card">
+                <h3>📚 Documentation</h3>
+                <div class="help-links">
+                  <a href="../docs.html" target="_blank">Getting Started Guide</a>
+                  <a href="../skills.html" target="_blank">52 Built-in Skills</a>
+                  <a href="../features.html" target="_blank">30 MCP Servers</a>
+                  <a href="../providers.html" target="_blank">AI Providers</a>
+                  <a href="../install.html" target="_blank">Installation Guide</a>
+                </div>
+              </div>
+              <div class="card">
+                <h3>❓ FAQ</h3>
+                <div v-for="f in faq" :key="f.q" class="faq-item">
+                  <div class="faq-q" @click="f.open = !f.open">{{ f.q }} <span>{{ f.open ? '−' : '+' }}</span></div>
+                  <div v-if="f.open" class="faq-a">{{ f.a }}</div>
+                </div>
+              </div>
+              <div class="card">
+                <h3>💬 Feedback</h3>
+                <form @submit.prevent="submitFeedback">
+                  <div class="form-group">
+                    <label>Message</label>
+                    <textarea v-model="feedbackMsg" rows="4" placeholder="Report a bug, suggest a feature..."></textarea>
+                  </div>
+                  <div v-if="feedbackSent" class="success-msg">✓ Feedback sent! Thank you.</div>
+                  <button type="submit" class="btn-primary">Send Feedback</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- DANGER ZONE -->
+          <div v-if="currentView === 'danger'" class="view-danger">
+            <h1 class="view-title" style="color:#ef4444">Danger Zone</h1>
+            <div class="card danger-card">
+              <h3>Export All Data</h3>
+              <p style="color:#64748b">Download a JSON export of all your profile, projects, and settings.</p>
+              <button class="btn-outline" @click="exportData">Export Data</button>
+            </div>
+            <div class="card danger-card" style="margin-top:16px">
+              <h3>Delete All Projects</h3>
+              <p style="color:#64748b">Remove all synced projects from the cloud. This cannot be undone.</p>
+              <button class="btn-danger" @click="confirmDeleteAll">Delete All Projects</button>
+            </div>
+            <div class="card danger-card" style="margin-top:16px">
+              <h3>Delete Account</h3>
+              <p style="color:#64748b">Permanently delete your account and all data. This cannot be undone.</p>
+              <div class="form-group" style="margin-top:12px">
+                <input type="text" v-model="deleteConfirmEmail" :placeholder="'Type ' + user.email + ' to confirm'">
+              </div>
+              <button class="btn-danger" @click="confirmDeleteAccount" :disabled="deleteConfirmEmail !== user.email">Delete My Account</button>
+            </div>
+          </div>
+
+          <!-- NOTIFICATIONS SETTINGS -->
+          <div v-if="currentView === 'settings-notifications'" class="view-notif-settings">
+            <h1 class="view-title">Notification Preferences</h1>
+            <div class="card">
+              <div v-for="pref in notifPrefs" :key="pref.key" class="notif-pref-row">
+                <div>
+                  <div class="pref-label">{{ pref.label }}</div>
+                  <div class="pref-desc">{{ pref.desc }}</div>
+                </div>
+                <label class="toggle">
+                  <input type="checkbox" v-model="pref.enabled" @change="saveNotifPrefs">
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
