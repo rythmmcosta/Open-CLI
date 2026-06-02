@@ -2,12 +2,17 @@ import inquirer from 'inquirer';
 import fetch from 'node-fetch';
 import Conf from 'conf';
 import { C } from '../ui/display';
+import { getDb } from '../db/index';
 
 const BASE_URL = 'https://opencli.myowncloud.tech/api';
+
+// Token is considered stale after 23 days (in ms)
+const TOKEN_STALE_MS = 23 * 24 * 60 * 60 * 1000;
 
 interface SyncConfig {
   token?: string;
   email?: string;
+  tokenSavedAt?: number;
 }
 
 interface SyncStore {
@@ -35,7 +40,7 @@ function saveSyncConfig(sync: SyncConfig): void {
   getSyncStore().set('sync', sync);
 }
 
-async function apiPost(endpoint: string, body: Record<string, string>, token?: string): Promise<unknown> {
+async function apiPost(endpoint: string, body: Record<string, unknown>, token?: string): Promise<{ status: number; data: unknown }> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
   const res = await fetch(`${BASE_URL}/${endpoint}`, {
@@ -43,14 +48,180 @@ async function apiPost(endpoint: string, body: Record<string, string>, token?: s
     headers,
     body: JSON.stringify(body),
   });
-  return res.json();
+  const data = await res.json();
+  return { status: res.status, data };
 }
 
-async function apiGet(endpoint: string, token?: string): Promise<unknown> {
+async function apiGet(endpoint: string, token?: string): Promise<{ status: number; data: unknown }> {
   const headers: Record<string, string> = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
   const res = await fetch(`${BASE_URL}/${endpoint}`, { headers });
-  return res.json();
+  const data = await res.json();
+  return { status: res.status, data };
+}
+
+async function tryRefreshToken(): Promise<string | null> {
+  const sync = getSyncConfig();
+  if (!sync.token) return null;
+  try {
+    const result = await apiPost('refresh-token.php', {}, sync.token);
+    const data = result.data as Record<string, unknown>;
+    if (data.token && typeof data.token === 'string') {
+      saveSyncConfig({ ...sync, token: data.token, tokenSavedAt: Date.now() });
+      return data.token;
+    }
+  } catch {
+    // silently fail
+  }
+  return null;
+}
+
+async function ensureFreshToken(): Promise<string | null> {
+  const sync = getSyncConfig();
+  if (!sync.token) return null;
+  const savedAt = sync.tokenSavedAt ?? 0;
+  if (Date.now() - savedAt > TOKEN_STALE_MS) {
+    const refreshed = await tryRefreshToken();
+    return refreshed ?? sync.token;
+  }
+  return sync.token;
+}
+
+async function handleUnauthorized(): Promise<string | null> {
+  console.log(C.yellow('\n  Session expired. Enter your password to continue:'));
+  const sync = getSyncConfig();
+  try {
+    const answers = await inquirer.prompt([
+      { type: 'password', name: 'password', message: '  Password:', mask: '*' },
+    ]);
+    const result = await apiPost('login.php', {
+      email: sync.email ?? '',
+      password: answers.password as string,
+    });
+    const data = result.data as Record<string, unknown>;
+    if (data.token && typeof data.token === 'string') {
+      saveSyncConfig({ ...sync, token: data.token, tokenSavedAt: Date.now() });
+      console.log(C.green('  Re-authenticated successfully.\n'));
+      return data.token;
+    }
+  } catch {
+    // fall through
+  }
+  console.log(C.red('  Re-authentication failed. Run: opencli sync login\n'));
+  return null;
+}
+
+interface ChatSession {
+  id: string;
+  project_hash: string | null;
+  project_name: string | null;
+  model: string | null;
+  skill: string | null;
+  msg_count: number;
+  input_tokens: number;
+  output_tokens: number;
+  cost_usd: number;
+  started_at: string | null;
+  ended_at: string | null;
+}
+
+interface ChatMessage {
+  id: string;
+  session_id: string;
+  role: string;
+  content: string;
+  tool_calls: unknown;
+  tokens: number;
+  created_at: string;
+}
+
+async function pushChatHistory(token: string): Promise<void> {
+  try {
+    const db = getDb();
+
+    // Fetch last 50 sessions
+    const rawSessions = db
+      .prepare('SELECT * FROM sessions ORDER BY started_at DESC LIMIT 50')
+      .all() as Array<{
+        id: string;
+        project_id: string | null;
+        model: string;
+        skill: string;
+        started_at: number;
+        ended_at: number | null;
+        msg_count: number;
+        input_tokens: number;
+        output_tokens: number;
+        cost_usd: number;
+      }>;
+
+    if (rawSessions.length === 0) {
+      console.log(C.dim('  No chat sessions to sync.'));
+      return;
+    }
+
+    console.log(C.dim(`  📤 Syncing chat history... (${rawSessions.length} sessions)`));
+
+    const sessionIds = rawSessions.map(s => s.id);
+
+    // Fetch messages for those sessions
+    const placeholders = sessionIds.map(() => '?').join(',');
+    const rawMessages = db
+      .prepare(`SELECT * FROM messages WHERE session_id IN (${placeholders}) ORDER BY created_at ASC`)
+      .all(...sessionIds) as Array<{
+        id: number;
+        session_id: string | null;
+        role: string;
+        content: string;
+        tool_calls: string | null;
+        tokens: number | null;
+        created_at: number;
+      }>;
+
+    const sessions: ChatSession[] = rawSessions.map(s => ({
+      id: s.id,
+      project_hash: s.project_id ?? null,
+      project_name: null,
+      model: s.model ?? null,
+      skill: s.skill ?? null,
+      msg_count: s.msg_count,
+      input_tokens: s.input_tokens,
+      output_tokens: s.output_tokens,
+      cost_usd: s.cost_usd,
+      started_at: s.started_at ? new Date(s.started_at).toISOString() : null,
+      ended_at: s.ended_at ? new Date(s.ended_at).toISOString() : null,
+    }));
+
+    const messages: ChatMessage[] = rawMessages.map(m => ({
+      id: String(m.id),
+      session_id: m.session_id ?? '',
+      role: m.role,
+      content: m.content,
+      tool_calls: m.tool_calls ? JSON.parse(m.tool_calls) : null,
+      tokens: m.tokens ?? 0,
+      created_at: new Date(m.created_at).toISOString(),
+    }));
+
+    const result = await apiPost('chat-push.php', { sessions, messages }, token);
+
+    if (result.status === 401) {
+      const newToken = await handleUnauthorized();
+      if (newToken) {
+        await pushChatHistory(newToken);
+      }
+      return;
+    }
+
+    const data = result.data as Record<string, unknown>;
+    if (data.success || result.status === 200) {
+      console.log(C.green(`  ✓ Chat history synced (${sessions.length} sessions, ${messages.length} messages)`));
+    } else {
+      const msg = typeof data.message === 'string' ? data.message : 'Server error';
+      console.log(C.yellow(`  ⚠ Chat history sync: ${msg}`));
+    }
+  } catch (err) {
+    console.log(C.yellow(`  ⚠ Chat history sync skipped: ${(err as Error).message}`));
+  }
 }
 
 async function loginCmd(): Promise<void> {
@@ -69,11 +240,12 @@ async function loginCmd(): Promise<void> {
       password: answers.password as string,
     }) as Record<string, unknown>;
 
-    if (result.token && typeof result.token === 'string') {
-      saveSyncConfig({ token: result.token, email: answers.email as string });
+    const data = result.data as Record<string, unknown>;
+    if (data.token && typeof data.token === 'string') {
+      saveSyncConfig({ token: data.token, email: answers.email as string, tokenSavedAt: Date.now() });
       console.log(C.green('\n  Logged in successfully!\n'));
     } else {
-      const message = typeof result.message === 'string' ? result.message : 'Login failed';
+      const message = typeof data.message === 'string' ? data.message : 'Login failed';
       console.log(C.red(`\n  Error: ${message}\n`));
     }
   } catch (err) {
@@ -97,9 +269,10 @@ async function registerCmd(): Promise<void> {
       email: answers.email as string,
       name: answers.name as string,
       password: answers.password as string,
-    }) as Record<string, unknown>;
+    });
+    const data = result.data as Record<string, unknown>;
 
-    if (result.success || result.message === 'OTP sent') {
+    if (data.success || data.message === 'OTP sent') {
       console.log(C.green('  Registration successful! Please enter the OTP sent to your email.'));
 
       const otpAnswer = await inquirer.prompt([
@@ -109,17 +282,18 @@ async function registerCmd(): Promise<void> {
       const verifyResult = await apiPost('verify.php', {
         email: answers.email as string,
         otp: otpAnswer.otp as string,
-      }) as Record<string, unknown>;
+      });
+      const verifyData = verifyResult.data as Record<string, unknown>;
 
-      if (verifyResult.token && typeof verifyResult.token === 'string') {
-        saveSyncConfig({ token: verifyResult.token, email: answers.email as string });
+      if (verifyData.token && typeof verifyData.token === 'string') {
+        saveSyncConfig({ token: verifyData.token, email: answers.email as string, tokenSavedAt: Date.now() });
         console.log(C.green('\n  Account verified and logged in!\n'));
       } else {
-        const msg = typeof verifyResult.message === 'string' ? verifyResult.message : 'Verification failed';
+        const msg = typeof verifyData.message === 'string' ? verifyData.message : 'Verification failed';
         console.log(C.red(`\n  Error: ${msg}\n`));
       }
     } else {
-      const message = typeof result.message === 'string' ? result.message : 'Registration failed';
+      const message = typeof data.message === 'string' ? data.message : 'Registration failed';
       console.log(C.red(`\n  Error: ${message}\n`));
     }
   } catch (err) {
@@ -142,13 +316,19 @@ async function statusCmd(): Promise<void> {
   console.log('\n' + C.blue.bold('  Sync Status') + '\n');
 
   try {
-    const [me, quota] = await Promise.all([
-      apiGet('me.php', sync.token) as Promise<Record<string, unknown>>,
-      apiGet('quota.php', sync.token) as Promise<Record<string, unknown>>,
+    const [meResult, quotaResult] = await Promise.all([
+      apiGet('me.php', sync.token),
+      apiGet('quota.php', sync.token),
     ]);
 
-    const meData = me as Record<string, unknown>;
-    const quotaData = quota as Record<string, unknown>;
+    if (meResult.status === 401) {
+      const newToken = await handleUnauthorized();
+      if (newToken) await statusCmd();
+      return;
+    }
+
+    const meData = meResult.data as Record<string, unknown>;
+    const quotaData = quotaResult.data as Record<string, unknown>;
 
     if (meData.name) console.log(`  Name:  ${C.green(String(meData.name))}`);
     if (meData.email) console.log(`  Email: ${C.green(String(meData.email))}`);
@@ -181,7 +361,13 @@ async function listCmd(): Promise<void> {
   }
 
   try {
-    const result = await apiGet('sync/list.php', sync.token) as Record<string, unknown>;
+    const listResult = await apiGet('sync/list.php', sync.token);
+    if (listResult.status === 401) {
+      const newToken = await handleUnauthorized();
+      if (newToken) await listCmd();
+      return;
+    }
+    const result = listResult.data as Record<string, unknown>;
     const projects = result.projects;
 
     if (Array.isArray(projects) && projects.length > 0) {
@@ -202,6 +388,42 @@ async function listCmd(): Promise<void> {
   }
 }
 
+async function pushCmd(): Promise<void> {
+  const sync = getSyncConfig();
+  if (!sync.token) {
+    console.log(C.yellow('\n  Not logged in. Run: opencli sync login\n'));
+    return;
+  }
+
+  const token = await ensureFreshToken();
+  if (!token) {
+    console.log(C.yellow('\n  No valid token. Run: opencli sync login\n'));
+    return;
+  }
+
+  console.log(C.dim('\n  Sync push: file archive coming soon'));
+  await pushChatHistory(token);
+  console.log();
+}
+
+async function messagesCmd(): Promise<void> {
+  const sync = getSyncConfig();
+  if (!sync.token) {
+    console.log(C.yellow('\n  Not logged in. Run: opencli sync login\n'));
+    return;
+  }
+
+  const token = await ensureFreshToken();
+  if (!token) {
+    console.log(C.yellow('\n  No valid token. Run: opencli sync login\n'));
+    return;
+  }
+
+  console.log();
+  await pushChatHistory(token);
+  console.log();
+}
+
 export async function runSync(subcommand: string | undefined, _args: string[]): Promise<void> {
   switch (subcommand) {
     case 'login':
@@ -217,7 +439,7 @@ export async function runSync(subcommand: string | undefined, _args: string[]): 
       await statusCmd();
       break;
     case 'push':
-      console.log(C.dim('\n  Sync push: coming soon (requires PHP API on server)\n'));
+      await pushCmd();
       break;
     case 'pull':
       console.log(C.dim('\n  Sync pull: coming soon\n'));
@@ -225,15 +447,19 @@ export async function runSync(subcommand: string | undefined, _args: string[]): 
     case 'list':
       await listCmd();
       break;
+    case 'messages':
+      await messagesCmd();
+      break;
     default:
       console.log('\n' + C.blue.bold('  Open CLI Sync') + '\n');
-      console.log('  ' + C.green('opencli sync login') + C.dim('     — Log in to your account'));
-      console.log('  ' + C.green('opencli sync register') + C.dim('  — Create a new account'));
-      console.log('  ' + C.green('opencli sync logout') + C.dim('    — Log out'));
-      console.log('  ' + C.green('opencli sync status') + C.dim('    — Show account and quota'));
-      console.log('  ' + C.green('opencli sync push') + C.dim('      — Push project (coming soon)'));
-      console.log('  ' + C.green('opencli sync pull') + C.dim('      — Pull project (coming soon)'));
-      console.log('  ' + C.green('opencli sync list') + C.dim('      — List synced projects'));
+      console.log('  ' + C.green('opencli sync login') + C.dim('      — Log in to your account'));
+      console.log('  ' + C.green('opencli sync register') + C.dim('   — Create a new account'));
+      console.log('  ' + C.green('opencli sync logout') + C.dim('     — Log out'));
+      console.log('  ' + C.green('opencli sync status') + C.dim('     — Show account and quota'));
+      console.log('  ' + C.green('opencli sync push') + C.dim('       — Push project files + chat history'));
+      console.log('  ' + C.green('opencli sync messages') + C.dim('   — Sync chat history to your account'));
+      console.log('  ' + C.green('opencli sync pull') + C.dim('       — Pull project (coming soon)'));
+      console.log('  ' + C.green('opencli sync list') + C.dim('       — List synced projects'));
       console.log();
   }
 }

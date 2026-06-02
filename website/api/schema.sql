@@ -127,3 +127,73 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS oauth_id VARCHAR(255) DEFAULT NULL;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(500) DEFAULT NULL;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS theme_preference VARCHAR(10) DEFAULT 'dark';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS accent_color VARCHAR(20) DEFAULT 'green';
+
+-- ============================================================
+-- Rate limiting
+CREATE TABLE IF NOT EXISTS rate_limit (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  ip           VARCHAR(45) NOT NULL,
+  action       VARCHAR(50) NOT NULL,
+  attempts     INT DEFAULT 1,
+  window_start DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY idx_ip_action (ip, action)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- Password resets
+CREATE TABLE IF NOT EXISTS password_resets (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT NOT NULL,
+  token      VARCHAR(64) UNIQUE NOT NULL,
+  expires_at DATETIME NOT NULL,
+  used       TINYINT(1) DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- Chat history sync
+CREATE TABLE IF NOT EXISTS chat_sessions (
+  id            VARCHAR(36) PRIMARY KEY,
+  user_id       INT NOT NULL,
+  project_hash  VARCHAR(64),
+  project_name  VARCHAR(255),
+  model         VARCHAR(100),
+  skill         VARCHAR(100),
+  msg_count     INT DEFAULT 0,
+  input_tokens  INT DEFAULT 0,
+  output_tokens INT DEFAULT 0,
+  cost_usd      DECIMAL(10,6) DEFAULT 0,
+  started_at    DATETIME,
+  ended_at      DATETIME,
+  synced_at     DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_user_started (user_id, started_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS chat_messages (
+  id          VARCHAR(36) PRIMARY KEY,
+  session_id  VARCHAR(36) NOT NULL,
+  user_id     INT NOT NULL,
+  role        ENUM('user','assistant','system','tool') NOT NULL,
+  content     MEDIUMTEXT,
+  tool_calls  JSON,
+  tokens      INT DEFAULT 0,
+  created_at  DATETIME,
+  synced_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_session (session_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- System announcements
+CREATE TABLE IF NOT EXISTS announcements (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  title      VARCHAR(255) NOT NULL,
+  message    TEXT NOT NULL,
+  level      ENUM('info','warning','critical') DEFAULT 'info',
+  is_active  TINYINT(1) DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  expires_at DATETIME DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
